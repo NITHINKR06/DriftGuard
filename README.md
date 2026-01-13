@@ -137,11 +137,3 @@ jupyter notebook notebooks/07_explainability_shap.ipynb
 ## 📝 License
 
 This project is licensed under the MIT License.
-
-## 👥 Contributors
-
-- Your Name
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
