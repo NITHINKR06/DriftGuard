@@ -127,13 +127,66 @@ class AutoencoderTrainer:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Train Autoencoder model')
-    parser.add_argument('--data', type=str, required=True, help='Path to training data')
-    parser.add_argument('--output', type=str, default='../models/autoencoder_model.h5',
+    parser.add_argument('--data', type=str, default='data/X_phase2.npy',
+                        help='Path to training data')
+    parser.add_argument('--output', type=str, default='models/autoencoder.keras',
                         help='Path to save the model')
-    parser.add_argument('--epochs', type=int, default=100, help='Number of epochs')
+    parser.add_argument('--epochs', type=int, default=50, help='Number of epochs')
     parser.add_argument('--encoding-dim', type=int, default=32, help='Encoding dimension')
+    parser.add_argument('--batch-size', type=int, default=256, help='Batch size')
+    parser.add_argument('--val-split', type=float, default=0.2, help='Validation split')
     
     args = parser.parse_args()
     
-    print("Training Autoencoder model...")
-    # Training implementation here
+    # Load data
+    print(f"Loading data from {args.data}...")
+    if args.data.endswith('.npy'):
+        X = np.load(args.data, allow_pickle=True)
+    elif args.data.endswith('.csv'):
+        import pandas as pd
+        df = pd.read_csv(args.data)
+        X = df.select_dtypes(include=[np.number]).values
+    else:
+        raise ValueError("Data file must be .npy or .csv")
+    
+    print(f"Loaded {X.shape[0]} samples with {X.shape[1]} features")
+    
+    # Split into train/val
+    from sklearn.model_selection import train_test_split
+    X_train, X_val = train_test_split(X, test_size=args.val_split, random_state=42)
+    
+    print(f"Train samples: {len(X_train)}, Validation samples: {len(X_val)}")
+    
+    # Create and train model
+    print(f"\nTraining Autoencoder model...")
+    print(f"  - encoding_dim: {args.encoding_dim}")
+    print(f"  - epochs: {args.epochs}")
+    print(f"  - batch_size: {args.batch_size}")
+    
+    trainer = AutoencoderTrainer(
+        input_dim=X.shape[1],
+        encoding_dim=args.encoding_dim
+    )
+    
+    history = trainer.train(
+        X_train, 
+        X_val=X_val,
+        epochs=args.epochs,
+        batch_size=args.batch_size
+    )
+    
+    # Save model
+    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+    trainer.save(args.output)
+    
+    # Compute reconstruction errors on validation set
+    print("\nComputing reconstruction errors on validation set...")
+    errors = trainer.compute_reconstruction_error(X_val[:10])
+    
+    print("\nSample Reconstruction Errors (first 10):")
+    for i, error in enumerate(errors):
+        print(f"  Sample {i}: MSE={error:.6f}")
+    
+    print(f"\nMean reconstruction error: {np.mean(errors):.6f}")
+    print(f"Std reconstruction error: {np.std(errors):.6f}")
+    print(f"\nTraining complete! Model saved to {args.output}")

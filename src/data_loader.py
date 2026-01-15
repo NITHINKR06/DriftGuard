@@ -118,12 +118,24 @@ def load_all_model_scores() -> Dict[str, np.ndarray]:
 def load_final_outputs() -> Tuple[np.ndarray, np.ndarray]:
     """
     Load final risk scores and ground truth labels.
+    Handles array length mismatch by truncating to the shorter length.
     
     Returns:
         Tuple of (risk_scores, labels)
     """
     risk_scores = np.load("data/final_risk_scores.npy", allow_pickle=True)
     labels = np.load("data/y_phase2.npy", allow_pickle=True)
+    
+    # Handle length mismatch by truncating to minimum length
+    min_len = min(len(risk_scores), len(labels))
+    if len(risk_scores) != len(labels):
+        print(f"Warning: Array length mismatch detected!")
+        print(f"  risk_scores: {len(risk_scores)} samples")
+        print(f"  labels: {len(labels)} samples")
+        print(f"  Truncating both to {min_len} samples")
+        risk_scores = risk_scores[:min_len]
+        labels = labels[:min_len]
+    
     print(f"Loaded {len(risk_scores)} final risk scores and labels")
     return risk_scores, labels
 

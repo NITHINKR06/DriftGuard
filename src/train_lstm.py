@@ -153,14 +153,79 @@ class LSTMTrainer:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Train LSTM model')
-    parser.add_argument('--data', type=str, required=True, help='Path to training data')
-    parser.add_argument('--output', type=str, default='../models/lstm_model.h5',
+    parser.add_argument('--data', type=str, default='data/X_phase2.npy',
+                        help='Path to training data')
+    parser.add_argument('--output', type=str, default='models/lstm_autoencoder.keras',
                         help='Path to save the model')
     parser.add_argument('--sequence-length', type=int, default=10,
                         help='Sequence length')
-    parser.add_argument('--epochs', type=int, default=100, help='Number of epochs')
+    parser.add_argument('--epochs', type=int, default=50, help='Number of epochs')
+    parser.add_argument('--batch-size', type=int, default=256, help='Batch size')
+    parser.add_argument('--val-split', type=float, default=0.2, help='Validation split')
     
     args = parser.parse_args()
     
-    print("Training LSTM model...")
-    # Training implementation here
+    # Load data
+    print(f"Loading data from {args.data}...")
+    if args.data.endswith('.npy'):
+        X = np.load(args.data, allow_pickle=True)
+    elif args.data.endswith('.csv'):
+        import pandas as pd
+        df = pd.read_csv(args.data)
+        X = df.select_dtypes(include=[np.number]).values
+    else:
+        raise ValueError("Data file must be .npy or .csv")
+    
+    print(f"Loaded {X.shape[0]} samples with {X.shape[1]} features")
+    
+    # Create trainer
+    trainer = LSTMTrainer(
+        sequence_length=args.sequence_length,
+        n_features=X.shape[1]
+    )
+    
+    # Create sequences
+    print(f"\nCreating sequences with length {args.sequence_length}...")
+    X_seq, y_seq = trainer.create_sequences(X, args.sequence_length)
+    print(f"Created {len(X_seq)} sequences")
+    
+    # Split into train/val
+    from sklearn.model_selection import train_test_split
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_seq, y_seq, 
+        test_size=args.val_split, 
+        random_state=42
+    )
+    
+    print(f"Train sequences: {len(X_train)}, Validation sequences: {len(X_val)}")
+    
+    # Train model
+    print(f"\nTraining LSTM model...")
+    print(f"  - sequence_length: {args.sequence_length}")
+    print(f"  - n_features: {X.shape[1]}")
+    print(f"  - epochs: {args.epochs}")
+    print(f"  - batch_size: {args.batch_size}")
+    
+    history = trainer.train(
+        X_train, y_train,
+        X_val=X_val, y_val=y_val,
+        epochs=args.epochs,
+        batch_size=args.batch_size
+    )
+    
+    # Save model
+    from pathlib import Path
+    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+    trainer.save(args.output)
+    
+    # Compute prediction errors on validation set
+    print("\nComputing prediction errors on validation set...")
+    errors = trainer.compute_prediction_error(X_val[:10], y_val[:10])
+    
+    print("\nSample Prediction Errors (first 10):")
+    for i, error in enumerate(errors):
+        print(f"  Sequence {i}: MSE={error:.6f}")
+    
+    print(f"\nMean prediction error: {np.mean(errors):.6f}")
+    print(f"Std prediction error: {np.std(errors):.6f}")
+    print(f"\nTraining complete! Model saved to {args.output}")

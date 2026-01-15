@@ -157,12 +157,120 @@ class AnomalyDetector:
 
 
 if __name__ == "__main__":
-    # Example usage
+    import sys
+    import argparse
+    
+    # Add parent directory to path for imports
+    sys.path.append('..')
+    from src import data_loader, risk_scoring, features
+    
+    parser = argparse.ArgumentParser(description='Run anomaly detection inference')
+    parser.add_argument('--data', type=str, default='data/X_phase2.npy',
+                        help='Path to input data')
+    parser.add_argument('--output', type=str, default='data/inference_results.csv',
+                        help='Path to save results')
+    parser.add_argument('--models-dir', type=str, default='models',
+                        help='Directory containing trained models')
+    
+    args = parser.parse_args()
+    
+    print("="*70)
+    print("ANOMALY DETECTION INFERENCE PIPELINE")
+    print("="*70)
+    
+    # Initialize detector
     detector = AnomalyDetector()
     
-    # Load models
-    # detector.load_model('iforest', '../models/iforest_model.pkl', 'sklearn')
-    # detector.load_model('autoencoder', '../models/autoencoder_model.h5', 'keras')
+    # Load all models
+    print("\n[1/5] Loading trained models...")
+    try:
+        detector.load_model('iforest', f'{args.models_dir}/isolation_forest.pkl', 'sklearn')
+        detector.load_model('autoencoder', f'{args.models_dir}/autoencoder.keras', 'keras')
+        detector.load_model('lstm', f'{args.models_dir}/lstm_autoencoder.keras', 'keras')
+    except Exception as e:
+        print(f"Error loading models: {e}")
+        print("Make sure models are trained and saved in the models directory.")
+        sys.exit(1)
     
-    # Make predictions
-    # predictions = detector.predict(X_test)
+    # Load data
+    print(f"\n[2/5] Loading input data from {args.data}...")
+    try:
+        if args.data.endswith('.npy'):
+            X = np.load(args.data, allow_pickle=True)
+        elif args.data.endswith('.csv'):
+            df = pd.read_csv(args.data)
+            X = df.select_dtypes(include=[np.number]).values
+        else:
+            raise ValueError("Data must be .npy or .csv")
+        
+        print(f"Loaded {X.shape[0]} samples with {X.shape[1]} features")
+    except Exception as e:
+        print(f"Error loading data: {e}")
+        sys.exit(1)
+    
+    # Run predictions
+    print("\n[3/5] Running model predictions...")
+    predictions = detector.predict(X)
+    
+    # Extract scores for risk computation
+    print("\n[4/5] Computing risk scores...")
+    model_scores = {}
+    
+    # Get Isolation Forest scores
+    if 'iforest_scores' in predictions:
+        model_scores['iforest'] = predictions['iforest_scores']
+        print(f"  - Isolation Forest: {len(model_scores['iforest'])} scores")
+    
+    # Get Autoencoder reconstruction errors
+    if 'autoencoder' in predictions:
+        autoencoder_model = detector.models['autoencoder']['model']
+        reconstructions = predictions['autoencoder']
+        errors = np.mean(np.power(X - reconstructions, 2), axis=1)
+        model_scores['autoencoder'] = errors
+        print(f"  - Autoencoder: {len(errors)} reconstruction errors")
+    
+    # Get LSTM prediction errors (simplified - using first n_features)
+    if 'lstm' in predictions:
+        lstm_pred = predictions['lstm']
+        # For full LSTM evaluation, you'd need sequences, but this is simplified
+        errors = np.mean(np.power(lstm_pred[:, :X.shape[1]] - X[:len(lstm_pred)], 2), axis=1)
+        model_scores['lstm'] = errors[:len(X)]
+        print(f"  - LSTM: {len(errors)} prediction errors")
+    
+    # Use risk scoring module
+    from src.risk_scoring import RiskScorer
+    
+    scorer = RiskScorer()
+    scorer.fit(model_scores)  # Fit on current data (in production, load pre-fitted)
+    
+    risk_scores, severity = scorer.score_and_classify(model_scores)
+    
+    # Create results dataframe
+    print("\n[5/5] Generating results...")
+    results_df = pd.DataFrame({
+        'sample_id': range(len(risk_scores)),
+        'risk_score': risk_scores,
+        'severity': severity
+    })
+    
+    # Add model scores
+    for model_name, scores in model_scores.items():
+        results_df[f'{model_name}_score'] = scores
+    
+    # Save results
+    results_df.to_csv(args.output, index=False)
+    print(f"\nResults saved to {args.output}")
+    
+    # Print summary
+    scorer.print_summary(risk_scores, severity)
+    
+    # Show top risks
+    print("\nTop 10 High-Risk Alerts:")
+    print("-" * 70)
+    top_alerts = results_df.nlargest(10, 'risk_score')
+    for idx, row in top_alerts.iterrows():
+        print(f"Sample {row['sample_id']:5d} | Risk: {row['risk_score']:.4f} | Severity: {row['severity']:6s}")
+    
+    print("\n" + "="*70)
+    print("INFERENCE COMPLETE")
+    print("="*70)
