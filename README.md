@@ -209,6 +209,27 @@ Located in `research/experiments/`:
 - Cross-dataset validation for generalization testing
 - Feature alignment required for compatibility
 
-## 📝 License
+## � Future Enhancements
+
+The following features are planned for future development and will be implemented in a Linux environment:
+
+### Zeek Real-Time Inference
+- **Integration with Zeek** (formerly Bro) network security monitor
+- Real-time network traffic analysis and anomaly detection
+- Live packet processing and feature extraction
+- Streaming prediction pipeline for production deployment
+- Requires: Zeek installation on Linux systems
+
+### MITRE ATT&CK Auto-Mapping
+- **Automatic attack technique classification** based on detected anomalies
+- Mapping of network intrusions to MITRE ATT&CK framework tactics and techniques
+- Enhanced threat intelligence and incident response capabilities
+- Integration with security orchestration workflows
+- Support for ATT&CK Navigator visualization
+
+> [!NOTE]
+> These features are currently in planning phase and will require a Linux deployment environment for production use. Development will begin after completing current research experiments on cross-dataset validation.
+
+## �📝 License
 
 This project is licensed under the MIT License.
