@@ -1,35 +1,56 @@
-# Anomaly Detection Project
+# DriftGuard
 
-A comprehensive anomaly detection system using multiple machine learning approaches including Isolation Forest, Autoencoders, and LSTM networks.
+An advanced network intrusion detection system using ensemble machine learning techniques with cross-dataset validation capabilities. DriftGuard focuses on detecting and analyzing dataset shift between different network traffic datasets (CICIDS2017 and UNSW-NB15).
 
 ## 📁 Project Structure
 
 ```
 .
-├── notebooks/              # Jupyter notebooks for exploration and experimentation
-│   ├── 01_data_exploration.ipynb
-│   ├── 02_feature_engineering.ipynb
-│   ├── 03_isolation_forest.ipynb
-│   ├── 04_autoencoder.ipynb
-│   ├── 05_lstm_sequence_model.ipynb
-│   ├── 06_model_evaluation.ipynb
-│   └── 07_explainability_shap.ipynb
+├── notebooks/              # Jupyter notebooks for model development
+│   ├── 01_data_exploration.ipynb          # CICIDS2017 dataset exploration
+│   ├── 02_feature_engineering.ipynb       # Feature engineering pipeline
+│   ├── 03_isolation_forest.ipynb          # Isolation Forest training
+│   ├── 04_autoencoder.ipynb               # Autoencoder training
+│   ├── 05_lstm_sequence_model.ipynb       # LSTM autoencoder training
+│   ├── 06_model_evaluation.ipynb          # Model evaluation metrics
+│   ├── 07_explainability_shap.ipynb       # SHAP-based model explainability
+│   └── 09_cross_dataset_validation.ipynb  # UNSW-NB15 cross-validation
+│
+├── research/               # Research experiments and analysis
+│   ├── experiments/
+│   │   ├── exp1_model_comparison.ipynb    # Comparative model analysis
+│   │   ├── exp2_false_positive_analysis.ipynb # False positive investigation
+│   │   └── exp3_dataset_shift_analysis.ipynb  # Distribution shift analysis
+│   ├── results/            # Experiment results and figures
+│   └── notes.md            # Research notes
 │
 ├── src/                    # Source code modules
-│   ├── data_loader.py      # Data loading utilities
-│   ├── features.py         # Feature engineering
-│   ├── train_iforest.py    # Isolation Forest training
-│   ├── train_autoencoder.py # Autoencoder training
-│   ├── train_lstm.py       # LSTM training
-│   ├── risk_scoring.py     # Risk scoring and ensemble methods
-│   └── inference.py        # Model inference
+│   ├── data_loader.py      # Data loading and preprocessing utilities
+│   ├── features.py         # Feature engineering transformations
+│   ├── train_iforest.py    # Isolation Forest training module
+│   ├── train_autoencoder.py # Autoencoder training module
+│   ├── train_lstm.py       # LSTM autoencoder training module
+│   ├── risk_scoring.py     # Ensemble risk scoring and fusion
+│   ├── inference.py        # End-to-end model inference
+│   ├── plot_utils.py       # Visualization utilities
+│   └── fix_plot_saving.py  # Plot saving helper functions
 │
-├── dashboard/              # Dashboard application
-├── data/                   # Data directory
-├── models/                 # Trained models
-├── reports/                # Generated reports and visualizations
+├── dashboard/              # Dashboard application (future)
+├── data/                   # Dataset storage (CICIDS2017, UNSW-NB15)
+├── models/                 # Saved trained models (.pkl, .keras)
+├── reports/                # Generated analysis reports
+├── results/                # Output results and visualizations
 └── README.md
 ```
+
+## 🎯 Project Overview
+
+DriftGuard is a research-focused intrusion detection system that:
+- **Trains** ensemble ML models (Isolation Forest, Autoencoder, LSTM) on CICIDS2017 dataset
+- **Validates** cross-dataset performance on UNSW-NB15 dataset
+- **Analyzes** dataset shift and distribution changes
+- **Explains** predictions using SHAP values
+- **Scores** anomalies using weighted ensemble fusion
 
 ## 🚀 Getting Started
 
@@ -37,13 +58,13 @@ A comprehensive anomaly detection system using multiple machine learning approac
 
 ```bash
 # Create a virtual environment
-python -m venv venv
+python -m venv .venv
 
 # Activate virtual environment
 # On Windows:
-venv\Scripts\activate
+.venv\Scripts\activate
 # On macOS/Linux:
-source venv/bin/activate
+source .venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
@@ -51,21 +72,19 @@ pip install -r requirements.txt
 
 ### Required Dependencies
 
-- pandas
-- numpy
-- scikit-learn
-- tensorflow
-- matplotlib
-- seaborn
-- shap
-- joblib
-- jupyter
+- **Data Processing**: pandas, numpy, scipy
+- **Machine Learning**: scikit-learn
+- **Deep Learning**: tensorflow, keras
+- **Visualization**: matplotlib, seaborn, plotly
+- **Explainability**: shap
+- **Model Persistence**: joblib
+- **Development**: jupyter, pytest
 
 ## 🔧 Usage
 
 ### 1. Data Exploration
 
-Start with the data exploration notebook:
+Explore the CICIDS2017 dataset:
 ```bash
 jupyter notebook notebooks/01_data_exploration.ipynb
 ```
@@ -76,63 +95,119 @@ Train individual models using the provided scripts:
 
 ```bash
 # Train Isolation Forest
-python src/train_iforest.py --data data/your_data.csv --output models/iforest.pkl
+python src/train_iforest.py
 
 # Train Autoencoder
-python src/train_autoencoder.py --data data/your_data.csv --output models/autoencoder.h5
+python src/train_autoencoder.py
 
-# Train LSTM
-python src/train_lstm.py --data data/your_data.csv --output models/lstm.h5
+# Train LSTM Autoencoder
+python src/train_lstm.py
 ```
 
-### 3. Making Predictions
+Models are saved to the `models/` directory:
+- `iforest_model.pkl` - Isolation Forest
+- `autoencoder.keras` - Autoencoder
+- `lstm_autoencoder.keras` - LSTM Autoencoder
 
-Use the inference module to make predictions:
+### 3. Cross-Dataset Validation
+
+Validate models on UNSW-NB15 dataset:
+```bash
+jupyter notebook notebooks/09_cross_dataset_validation.ipynb
+```
+
+### 4. Making Predictions
+
+Use the inference module for end-to-end detection:
 
 ```python
 from src.inference import AnomalyDetector
 
+# Initialize detector
 detector = AnomalyDetector()
-detector.load_model('iforest', 'models/iforest.pkl', 'sklearn')
-detector.load_model('autoencoder', 'models/autoencoder.h5', 'keras')
 
+# Load trained models
+detector.load_model('iforest', 'models/iforest_model.pkl', 'sklearn')
+detector.load_model('autoencoder', 'models/autoencoder.keras', 'keras')
+detector.load_model('lstm', 'models/lstm_autoencoder.keras', 'keras')
+
+# Make predictions
 predictions = detector.predict(X_test)
+risk_scores = detector.get_risk_scores(X_test)
 ```
 
 ## 📊 Models
 
 ### Isolation Forest
-- Unsupervised anomaly detection
+- Unsupervised tree-based anomaly detection
 - Fast training and inference
-- Good for high-dimensional data
+- Effective for high-dimensional network traffic data
+- Contamination factor: 0.1
 
 ### Autoencoder
-- Neural network-based reconstruction
-- Learns normal patterns
-- Detects anomalies via reconstruction error
+- Dense neural network-based reconstruction
+- Architecture: 77 → 50 → 25 → 50 → 77
+- Learns normal traffic patterns via reconstruction error
+- Trained on benign traffic samples only
 
-### LSTM
-- Sequence-based anomaly detection
-- Temporal pattern recognition
-- Suitable for time-series data
+### LSTM Autoencoder
+- Sequence-based temporal pattern learning
+- Bidirectional LSTM layers for time-series modeling
+- Window size: 10 timesteps
+- Captures temporal dependencies in network flows
 
-## 📈 Risk Scoring
+## 📈 Risk Scoring System
 
-The project includes an ensemble risk scoring system that combines predictions from multiple models:
+DriftGuard uses a weighted ensemble approach combining all three models:
 
 ```python
 from src.risk_scoring import RiskScorer
 
-scorer = RiskScorer(weights={'iforest': 0.3, 'autoencoder': 0.4, 'lstm': 0.3})
+# Initialize with custom weights
+scorer = RiskScorer(weights={
+    'iforest': 0.3, 
+    'autoencoder': 0.4, 
+    'lstm': 0.3
+})
+
+# Compute ensemble risk score
 ensemble_score = scorer.compute_ensemble_score(scores_dict)
 ```
 
+Risk scores are normalized to [0, 1] where higher values indicate greater anomaly likelihood.
+
 ## 🔍 Model Explainability
 
-SHAP (SHapley Additive exPlanations) is used for model interpretability:
+SHAP (SHapley Additive exPlanations) provides feature-level interpretability:
+
 ```bash
 jupyter notebook notebooks/07_explainability_shap.ipynb
 ```
+
+Includes:
+- Waterfall plots for individual predictions
+- Feature importance ranking
+- False positive analysis
+
+## 🧪 Research Experiments
+
+Located in `research/experiments/`:
+
+1. **Model Comparison** - Performance benchmarking across models
+2. **False Positive Analysis** - SHAP-based investigation of misclassifications
+3. **Dataset Shift Analysis** - Distribution comparison between CICIDS2017 and UNSW-NB15
+
+## 📂 Datasets
+
+### CICIDS2017 (Training)
+- Canadian Institute for Cybersecurity dataset
+- Modern network traffic with labeled attacks
+- Training set: benign traffic samples
+
+### UNSW-NB15 (Validation)
+- University of New South Wales dataset
+- Cross-dataset validation for generalization testing
+- Feature alignment required for compatibility
 
 ## 📝 License
 
