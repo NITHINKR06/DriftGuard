@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="DriftGuard - Advanced Network Intrusion Detection System with Cross-Dataset Validation">
+    <title>DriftGuard - Project Overview</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #22d3ee;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
+            overflow: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(100px);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 2rem;
+            max-width: 1000px;
+        }
+
+        .logo {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            animation: slideDown 1s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            color: var(--text-primary);
+            animation: slideUp 1s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeIn 2s ease-out;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(99, 102, 241, 0.6);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: var(--bg-dark);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section {
+            margin-bottom: 5rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .feature-text h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .feature-text p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .workflow {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: start;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .workflow-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 1.75rem;
+            top: 4rem;
+            width: 2px;
+            height: calc(100% + 0.5rem);
+            background: linear-gradient(180deg, var(--primary), transparent);
+        }
+
+        .step-number {
+            background: var(--gradient);
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .tech-badge {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(34, 211, 238, 0.2));
+            border: 1px solid var(--primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tech-badge:hover {
+            background: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-card);
+            border-radius: 1rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.1));
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 2rem 0;
+        }
+
+        .highlight-title {
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        footer {
+            background: var(--bg-card);
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+
+            .tagline {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="logo">🛡️ DriftGuard</h1>
+            <p class="tagline">Advanced Network Intrusion Detection with Cross-Dataset Validation</p>
+            <p class="hero-description">
+                An ensemble machine learning system that detects network anomalies and adapts to dataset shifts,
+                combining Isolation Forest, Autoencoders, and LSTM models with explainable AI for security analysts.
+            </p>
+            <div class="cta-buttons">
+                <a href="#how-it-works" class="btn btn-primary">⚙️ How It Works</a>
+                <a href="#getting-started" class="btn btn-outline">🚀 Get Started</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- What is DriftGuard -->
+    <div class="container">
+        <section class="section">
+            <h2 class="section-title">🎯 What is DriftGuard?</h2>
+            <p class="section-subtitle">Solving the dataset shift problem in cybersecurity</p>
+
+            <div class="highlight">
+                <div class="highlight-title">💡 The Problem</div>
+                <p>Traditional intrusion detection systems fail when deployed in environments different from where they
+                    were trained.
+                    A model trained on university network traffic may produce thousands of false alerts in a corporate
+                    network,
+                    leading to alert fatigue and missed real threats.</p>
+            </div>
+
+            <div class="highlight">
+                <div class="highlight-title">✅ The Solution</div>
+                <p>DriftGuard uses an ensemble of complementary anomaly detection models, validated across different
+                    datasets
+                    (CICIDS2017 → UNSW-NB15), with built-in distribution shift analysis and explainable predictions to
+                    maintain
+                    performance across diverse network environments.</p>
+            </div>
+        </section>
+
+        <!-- Core Models -->
+        <section class="section">
+            <h2 class="section-title">🤖 Three Detection Engines</h2>
+            <p class="section-subtitle">Complementary approaches for robust anomaly detection</p>
+
+            <div class="cards">
+                <div class="card">
+                    <div class="card-icon">🌲</div>
+                    <h3 class="card-title">Isolation Forest</h3>
+                    <p class="card-description">
+                        Tree-based outlier detection that isolates anomalies based on feature randomness.
+                        Fast, effective for high-dimensional data. <strong>Weight: 30%</strong>
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">🧠</div>
+                    <h3 class="card-title">Autoencoder</h3>
+                    <p class="card-description">
+                        Dense neural network (77→50→25→50→77) that learns normal patterns through reconstruction.
+                        Flags traffic based on MSE. <strong>Weight: 40%</strong>
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">⏱️</div>
+                    <h3 class="card-title">LSTM Autoencoder</h3>
+                    <p class="card-description">
+                        Bidirectional LSTM capturing temporal dependencies across 10-timestep windows.
+                        Detects sequence-based anomalies. <strong>Weight: 30%</strong>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="section" id="how-it-works">
+            <h2 class="section-title">⚙️ How It Works</h2>
+            <p class="section-subtitle">From raw traffic to actionable insights</p>
+
+            <div class="workflow">
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Data Preprocessing</h3>
+                        <p>Raw network traffic (CICIDS2017/UNSW-NB15) → Feature extraction → Cleaning (NaN, infinity) →
+                            Scaling (StandardScaler) → 77-feature matrix saved as .npy</p>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Model Training</h3>
+                        <p>Train all three models on <strong>benign traffic only</strong> from CICIDS2017. Models learn
+                            what "normal" looks like, then flag deviations as anomalies during inference.</p>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Ensemble Scoring</h3>
+                        <p>Normalize model outputs to [0,1] → Apply weighted fusion (0.3×IF + 0.4×AE + 0.3×LSTM) →
+                            Generate unified risk score → Classify as HIGH/MEDIUM/LOW severity</p>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Explainability</h3>
+                        <p>SHAP values explain which features contributed to each prediction. Security analysts see
+                            waterfall plots showing feature importance for flagged traffic.</p>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Cross-Dataset Validation</h3>
+                        <p>Align UNSW-NB15 features to CICIDS2017 space → Apply trained models → Measure performance
+                            degradation → Analyze distribution shifts using KS tests and PSI</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Features -->
+        <section class="section">
+            <h2 class="section-title">✨ Key Features</h2>
+
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">🔄</div>
+                    <div class="feature-text">
+                        <h3>Cross-Dataset Generalization</h3>
+                        <p>Validated on UNSW-NB15 after training on CICIDS2017</p>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-text">
+                        <h3>Ensemble Fusion</h3>
+                        <p>Weighted combination of three complementary models</p>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">
+                        <h3>Distribution Analysis</h3>
+                        <p>KS tests and PSI to quantify dataset drift</p>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🔍</div>
+                    <div class="feature-text">
+                        <h3>SHAP Explanations</h3>
+                        <p>Feature-level interpretability for every prediction</p>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-text">
+                        <h3>Fast Inference</h3>
+                        <p>~2,380 samples/sec, 420ms per 1000 samples</p>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🪶</div>
+                    <div class="feature-text">
+                        <h3>Lightweight</h3>
+                        <p>Only 3MB total model size for easy deployment</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technology Stack -->
+        <section class="section">
+            <h2 class="section-title">🛠️ Technology Stack</h2>
+
+            <div class="tech-stack">
+                <span class="tech-badge">🐍 Python</span>
+                <span class="tech-badge">📊 Pandas & NumPy</span>
+                <span class="tech-badge">🤖 Scikit-learn</span>
+                <span class="tech-badge">🧠 TensorFlow/Keras</span>
+                <span class="tech-badge">📈 Matplotlib & Seaborn</span>
+                <span class="tech-badge">💡 SHAP</span>
+                <span class="tech-badge">📓 Jupyter</span>
+                <span class="tech-badge">🎨 Streamlit</span>
+            </div>
+        </section>
+
+        <!-- Statistics -->
+        <section class="section">
+            <h2 class="section-title">📈 Project Statistics</h2>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number">77</div>
+                    <div class="stat-label">Network Features</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Detection Models</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Datasets Validated</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">~65</div>
+                    <div class="stat-label">Training Minutes</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">3MB</div>
+                    <div class="stat-label">Total Model Size</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">2.3K</div>
+                    <div class="stat-label">Samples/Second</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Use Cases -->
+        <section class="section">
+            <h2 class="section-title">🎯 Use Cases</h2>
+
+            <div class="cards">
+                <div class="card">
+                    <div class="card-icon">🏢</div>
+                    <h3 class="card-title">Security Operations Centers</h3>
+                    <p class="card-description">
+                        Reduce alert fatigue with ensemble scoring and SHAP explanations that help analysts
+                        prioritize real threats over false positives.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">🔬</div>
+                    <h3 class="card-title">Research & Academia</h3>
+                    <p class="card-description">
+                        Study cross-dataset generalization, dataset shift quantification, and ensemble methods
+                        for anomaly detection in cybersecurity.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">🏭</div>
+                    <h3 class="card-title">Enterprise Networks</h3>
+                    <p class="card-description">
+                        Deploy models trained on public datasets (CICIDS2017) to private networks with
+                        confidence in cross-environment performance.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Future Roadmap -->
+        <section class="section">
+            <h2 class="section-title">🚀 Future Enhancements</h2>
+
+            <div class="highlight">
+                <div class="highlight-title">🔮 Zeek Real-Time Inference (Linux)</div>
+                <p>Integration with Zeek network security monitor for live traffic analysis, streaming predictions,
+                    and real-time anomaly detection in production environments.</p>
+            </div>
+
+            <div class="highlight">
+                <div class="highlight-title">🗺️ MITRE ATT&CK Auto-Mapping</div>
+                <p>Automatic classification of detected anomalies to MITRE ATT&CK tactics and techniques,
+                    enhancing threat intelligence and incident response workflows.</p>
+            </div>
+        </section>
+
+        <!-- Getting Started -->
+        <section class="section">
+            <h2 class="section-title">🚀 Getting Started</h2>
+
+            <div class="workflow">
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Clone Repository</h3>
+                        <p><code>git clone &lt;repository-url&gt;</code></p>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Setup Environment</h3>
+                        <p><code>python -m venv .venv && .venv\Scripts\activate && pip install -r requirements.txt</code>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Train Models</h3>
+                        <p>Run training scripts or Jupyter notebooks in <code>notebooks/</code> directory</p>
+                    </div>
+                </div>
+
+                <div class="workflow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Make Predictions</h3>
+                        <p>Use <code>src/inference.py</code> for end-to-end anomaly detection on new traffic</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>🛡️ DriftGuard - Advanced Network Intrusion Detection System</p>
+        <p style="margin-top: 0.5rem;">Licensed under MIT License</p>
+        <p style="margin-top: 1rem; font-size: 0.9rem;">
+            <a href="docs/00_INDEX.md" style="color: var(--primary); text-decoration: none;">📚 Full Documentation</a> |
+            <a href="README.md" style="color: var(--primary); text-decoration: none;">📖 README</a> |
+            <a href="research/notes.md" style="color: var(--primary); text-decoration: none;">🔬 Research Notes</a>
+        </p>
+    </footer>
+</body>
+
+</html>
