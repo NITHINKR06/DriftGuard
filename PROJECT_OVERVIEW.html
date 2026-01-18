@@ -28,6 +28,10 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
             background: var(--bg-dark);
@@ -712,7 +716,7 @@
         </section>
 
         <!-- Getting Started -->
-        <section class="section">
+        <section class="section" id="getting-started">
             <h2 class="section-title">🚀 Getting Started</h2>
 
             <div class="workflow">
@@ -755,12 +759,9 @@
     <!-- Footer -->
     <footer>
         <p>🛡️ DriftGuard - Advanced Network Intrusion Detection System</p>
+        <p style="margin-top: 0.5rem;">An ensemble machine learning approach to network intrusion detection with
+            cross-dataset validation</p>
         <p style="margin-top: 0.5rem;">Licensed under MIT License</p>
-        <p style="margin-top: 1rem; font-size: 0.9rem;">
-            <a href="docs/00_INDEX.md" style="color: var(--primary); text-decoration: none;">📚 Full Documentation</a> |
-            <a href="README.md" style="color: var(--primary); text-decoration: none;">📖 README</a> |
-            <a href="research/notes.md" style="color: var(--primary); text-decoration: none;">🔬 Research Notes</a>
-        </p>
     </footer>
 </body>
 
