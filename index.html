@@ -472,8 +472,11 @@
                 ├── data/ # Dataset storage
                 │ ├── CICIDS2017/ # Training dataset (CSV files)
                 │ ├── UNSW-NB15/ # Validation dataset (CSV files)
+                │ ├── UGR16/ # Real-world validation dataset
+                │ ├── unsw/ # UNSW-NB15 preprocessed data
                 │ ├── X_phase2.npy # Preprocessed features (77 dims)
-                │ └── y_phase2.npy # Labels (0=benign, 1=attack)
+                │ ├── y_phase2.npy # Labels (0=benign, 1=attack)
+                │ └── ugr_*.npy # UGR16 predictions and scores
                 │
                 ├── models/ # Trained models
                 │ ├── iforest_model.pkl # Isolation Forest (1.8 MB)
@@ -504,7 +507,8 @@
                 │ ├── experiments/
                 │ │ ├── exp1_model_comparison.ipynb # Compare 3 models
                 │ │ ├── exp2_false_positive_analysis.ipynb # FP investigation
-                │ │ └── exp3_dataset_shift_analysis.ipynb # KS/PSI analysis
+                │ │ ├── exp3_dataset_shift_analysis.ipynb # KS/PSI analysis
+                │ │ └── exp4_ugr16_real_world_validation.ipynb # UGR16 validation
                 │ └── results/ # Figures, plots, metrics
                 │
                 ├── docs/ # Comprehensive documentation
@@ -564,7 +568,8 @@
             </ul>
 
             <div class="highlight">
-                <strong>🔬 Research Value:</strong> Using three different datasets (CICIDS2017, UNSW-NB15, UGR16) allows us to measure how well our
+                <strong>🔬 Research Value:</strong> Using three different datasets (CICIDS2017, UNSW-NB15, UGR16) allows
+                us to measure how well our
                 models generalize across diverse network environments - a critical requirement for practical deployment.
             </div>
         </div>

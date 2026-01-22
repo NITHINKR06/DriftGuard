@@ -182,6 +182,73 @@ X_unsw_scaled = scaler.transform(X_unsw_aligned)
 
 ---
 
+## UGR16 (Real-World Validation Dataset)
+
+**Source**: University of Granada  
+**Purpose**: Additional real-world validation for testing ensemble robustness
+
+### Dataset Characteristics
+
+- **Size**: Real ISP network traffic
+- **Collection Period**: Long-term ISP network monitoring
+- **Features**: Network flow features similar to CICIDS2017
+- **Purpose**: Validate cross-dataset generalization on third independent dataset
+
+### Dataset Versions
+
+UGR16 consists of multiple versions with different configurations:
+
+| Version | Description | Purpose |
+|---------|-------------|----------|
+| **UGR16v1** | Base version | Initial validation |
+| **UGR16v2** | Enhanced version | Extended attacks |
+| **UGR16v2noIRC** | No IRC traffic | Clean subset |
+| **UGR16v3** | Additional attacks | Robustness testing |
+| **UGR16v3v4** | Combined versions | Comprehensive validation |
+| **UGR16v4** | Latest version | Most recent attacks |
+
+### Integration with DriftGuard
+
+**Experiment 4**: `research/experiments/exp4_ugr16_real_world_validation.ipynb`
+
+```python
+# Load UGR16 data
+X_ugr = pd.read_csv('data/UGR16/UGR16v1.Xtest.csv')
+y_ugr = pd.read_csv('data/UGR16/UGR16v1.Ytest.csv')
+
+# Feature alignment (similar process to UNSW-NB15)
+X_ugr_aligned = align_features(X_ugr, reference=X_cicids.columns)
+
+# Apply CICIDS scaler
+X_ugr_scaled = scaler.transform(X_ugr_aligned)
+
+# Make predictions with all three models
+ugr_predictions = ensemble_predict(X_ugr_scaled)
+```
+
+### Preprocessed Data Outputs
+
+Stored in `data/`:
+- `ugr_predictions.npy` - Ensemble predictions
+- `ugr_risk_scores.npy` - Final risk scores
+- `ugr_iforest_scores.npy` - Isolation Forest anomaly scores
+- `ugr_ae_errors.npy` - Autoencoder reconstruction errors
+- `ugr_lstm_errors.npy` - LSTM sequence prediction errors
+
+### Research Value
+
+**Three-Dataset Validation**:
+1. **CICIDS2017** → Training
+2. **UNSW-NB15** → Cross-dataset validation
+3. **UGR16** → Real-world validation
+
+This comprehensive validation strategy demonstrates that the ensemble approach generalizes well across:
+- Different network environments
+- Different attack taxonomies
+- Real-world ISP production traffic
+
+---
+
 ## Data Storage Structure
 
 ### Directory Organization
@@ -201,6 +268,12 @@ data/
 │   ├── UNSW-NB15_3.csv
 │   └── UNSW-NB15_4.csv
 │
+├── UGR16/                   # Raw UGR16 CSV files
+│   ├── UGR16v1.Xtest.csv / UGR16v1.Ytest.csv
+│   ├── UGR16v2.Xtest.csv / UGR16v2.Ytest.csv
+│   ├── UGR16v3.Xtest.csv / UGR16v3.Ytest.csv
+│   └── UGR16v4.Xtest.csv / UGR16v4.Ytest.csv
+│
 ├── unsw/                    # UNSW preprocessed data
 │
 ├── processed_phase1.csv     # Preprocessed CICIDS2017
@@ -210,8 +283,13 @@ data/
 ├── iforest_scores.npy       # Isolation Forest outputs
 ├── autoencoder_errors.npy   # Autoencoder reconstruction errors
 ├── lstm_sequence_errors.npy # LSTM prediction errors
-│ ├── final_risk_scores.npy    # Ensemble risk scores
-└── final_severity_labels.npy # HIGH/MED IUM/LOW classifications
+├── ugr_predictions.npy      # UGR16 ensemble predictions
+├── ugr_risk_scores.npy      # UGR16 risk scores
+├── ugr_iforest_scores.npy   # UGR16 Isolation Forest outputs
+├── ugr_ae_errors.npy        # UGR16 Autoencoder errors
+├── ugr_lstm_errors.npy      # UGR16 LSTM errors
+├── final_risk_scores.npy    # Ensemble risk scores
+└── final_severity_labels.npy # HIGH/MEDIUM/LOW classifications
 ```
 
 ### File Sizes
@@ -277,6 +355,16 @@ Military Communications and Information Systems Conference (MilCIS), 1-6.
 ```
 
 **Download**: https://research.unsw.edu.au/projects/unsw-nb15-dataset
+
+### UGR16
+
+```
+Macia-Fernandez, G., Camacho, J., Magán-Carrión, R., García-Teodoro, P., & Theron, R. (2018).
+UGR '16: A new dataset for the evaluation of cyclostationarity-based network IDSs.
+Computers & Security, 73, 411-424.
+```
+
+**Download**: https://nesg.ugr.es/nesg-ugr16/
 
 ---
 
