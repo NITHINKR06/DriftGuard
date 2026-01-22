@@ -10,7 +10,7 @@ Welcome to the DriftGuard research documentation! This folder contains comprehen
 3. **[02_ARCHITECTURE.md](02_ARCHITECTURE.md)** - System design and components
 
 ### detailed Documentation
-4. **03_DATASETS.md** - CICIDS2017 and UNSW-NB15 datasets
+4. **03_DATASETS.md** - CICIDS2017, UNSW-NB15, and UGR16 datasets
 5. **04_METHODOLOGY.md** - Research methodology and approach
 6. **05_IMPLEMENTATION.md** - Code structure and modules
 7. **06_MODELS.md** - Model architectures and training
@@ -51,7 +51,7 @@ Welcome to the DriftGuard research documentation! This folder contains comprehen
 | 00_INDEX.md | ✅ Complete | Main index and navigation |
 | 01_INTRODUCTION.md | ✅ Complete | Problem statement, motivation, research questions |
 | 02_ARCHITECTURE.md | ✅ Complete | System architecture, components, flow diagrams |
-| 03_DATASETS.md | 🚧 Pending | Dataset descriptions (see RESEARCH_DOCUMENTATION.md) |
+| 03_DATASETS.md | 🚧 Pending | Three datasets: CICIDS2017, UNSW-NB15, UGR16 |
 | 04_METHODOLOGY.md | 🚧 Pending | Methodology details (see RESEARCH_DOCUMENTATION.md) |
 | 05_IMPLEMENTATION.md | 🚧 Pending | Implementation details (see RESEARCH_DOCUMENTATION.md) |
 | 06_MODELS.md | 🚧 Pending | Model architectures (see RESEARCH_DOCUMENTATION.md) |

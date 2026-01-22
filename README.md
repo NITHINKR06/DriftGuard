@@ -20,7 +20,8 @@ An advanced network intrusion detection system using ensemble machine learning t
 │   ├── experiments/
 │   │   ├── exp1_model_comparison.ipynb    # Comparative model analysis
 │   │   ├── exp2_false_positive_analysis.ipynb # False positive investigation
-│   │   └── exp3_dataset_shift_analysis.ipynb  # Distribution shift analysis
+│   │   ├── exp3_dataset_shift_analysis.ipynb  # Distribution shift analysis
+│   │   └── exp4_ugr16_real_world_validation.ipynb # UGR16 validation
 │   ├── results/            # Experiment results and figures
 │   └── notes.md            # Research notes
 │
@@ -36,7 +37,7 @@ An advanced network intrusion detection system using ensemble machine learning t
 │   └── fix_plot_saving.py  # Plot saving helper functions
 │
 ├── dashboard/              # Dashboard application (future)
-├── data/                   # Dataset storage (CICIDS2017, UNSW-NB15)
+├── data/                   # Dataset storage (CICIDS2017, UNSW-NB15, UGR16)
 ├── models/                 # Saved trained models (.pkl, .keras)
 ├── reports/                # Generated analysis reports
 ├── results/                # Output results and visualizations
@@ -47,8 +48,8 @@ An advanced network intrusion detection system using ensemble machine learning t
 
 DriftGuard is a research-focused intrusion detection system that:
 - **Trains** ensemble ML models (Isolation Forest, Autoencoder, LSTM) on CICIDS2017 dataset
-- **Validates** cross-dataset performance on UNSW-NB15 dataset
-- **Analyzes** dataset shift and distribution changes
+- **Validates** cross-dataset performance on UNSW-NB15 and UGR16 datasets
+- **Analyzes** dataset shift and distribution changes across multiple environments
 - **Explains** predictions using SHAP values
 - **Scores** anomalies using weighted ensemble fusion
 
@@ -196,6 +197,7 @@ Located in `research/experiments/`:
 1. **Model Comparison** - Performance benchmarking across models
 2. **False Positive Analysis** - SHAP-based investigation of misclassifications
 3. **Dataset Shift Analysis** - Distribution comparison between CICIDS2017 and UNSW-NB15
+4. **UGR16 Real-World Validation** - Additional validation on UGR16 dataset
 
 ## 📂 Datasets
 
@@ -204,10 +206,18 @@ Located in `research/experiments/`:
 - Modern network traffic with labeled attacks
 - Training set: benign traffic samples
 
-### UNSW-NB15 (Validation)
+### UNSW-NB15 (Cross-Dataset Validation)
 - University of New South Wales dataset
 - Cross-dataset validation for generalization testing
 - Feature alignment required for compatibility
+- Preprocessed data available in `data/unsw/`
+
+### UGR16 (Real-World Validation)
+- University of Granada dataset
+- Additional real-world validation dataset
+- Multiple versions (v1, v2, v3, v4) with different configurations
+- Recent integration in Experiment 4 for robustness testing
+- Preprocessed predictions and scores in `data/ugr_*.npy`
 
 ## � Future Enhancements
 

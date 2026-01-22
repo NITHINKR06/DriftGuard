@@ -539,7 +539,7 @@
                 <li>Labeled data (0=benign, 1=attack)</li>
             </ul>
 
-            <h3>UNSW-NB15 (Validation Dataset)</h3>
+            <h3>UNSW-NB15 (Cross-Dataset Validation)</h3>
             <p><strong>Source:</strong> University of New South Wales</p>
             <p><strong>Purpose:</strong> Cross-dataset validation (test generalization)</p>
             <p><strong>Characteristics:</strong></p>
@@ -548,11 +548,24 @@
                 <li>49 native features (mapped to 77 for compatibility)</li>
                 <li>Different attack types: Exploits, Reconnaissance, Shellcode, Worms</li>
                 <li>Used to test if models generalize to new environments</li>
+                <li>Preprocessed data stored in <code>data/unsw/</code></li>
+            </ul>
+
+            <h3>UGR16 (Real-World Validation)</h3>
+            <p><strong>Source:</strong> University of Granada</p>
+            <p><strong>Purpose:</strong> Additional real-world validation dataset</p>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+                <li>Multiple versions (v1, v2, v3, v4) with different configurations</li>
+                <li>Real-world ISP network traffic</li>
+                <li>Recently integrated in Experiment 4 for robustness testing</li>
+                <li>Preprocessed predictions: <code>data/ugr_*.npy</code> files</li>
+                <li>Three-dataset validation ensures system robustness</li>
             </ul>
 
             <div class="highlight">
-                <strong>🔬 Research Value:</strong> Using two different datasets allows us to measure how well our
-                models generalize across network environments - a critical requirement for practical deployment.
+                <strong>🔬 Research Value:</strong> Using three different datasets (CICIDS2017, UNSW-NB15, UGR16) allows us to measure how well our
+                models generalize across diverse network environments - a critical requirement for practical deployment.
             </div>
         </div>
 
@@ -790,11 +803,13 @@ risk_scores = detector.get_risk_scores(X_test)</code></pre>
             <h3>Key Findings</h3>
             <div class="highlight">
                 <p><strong>Finding 1:</strong> Ensemble methods maintain ~15-20% higher accuracy on cross-dataset
-                    validation compared to individual models</p>
+                    validation compared to individual models across three different datasets</p>
                 <p><strong>Finding 2:</strong> SHAP explanations revealed that protocol-level features (ports, flags)
                     are more stable across datasets than derivative features (bytes/s, packets/s)</p>
                 <p><strong>Finding 3:</strong> Dataset shift is quantifiable - PSI and KS tests can predict which
                     features will cause performance degradation in new environments</p>
+                <p><strong>Finding 4:</strong> Three-dataset validation (CICIDS2017 → UNSW-NB15 → UGR16) demonstrates
+                    that ensemble approaches generalize well to diverse real-world environments</p>
             </div>
         </div>
 

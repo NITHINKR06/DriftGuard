@@ -75,7 +75,14 @@ data/
 ├── iforest_scores.npy
 ├── lstm_sequence_errors.npy
 ├── processed_phase1.csv
-└── shap_values_high_risk.npy
+├── shap_values_high_risk.npy
+├── ugr_ae_errors.npy
+├── ugr_iforest_scores.npy
+├── ugr_lstm_errors.npy
+├── ugr_predictions.npy
+├── ugr_risk_scores.npy
+├── X_phase2.npy
+└── y_phase2.npy
 ```
 
 ## Documentation
@@ -205,3 +212,4 @@ results/
 - Excluded directories: `.venv`, `__pycache__`, `.git`
 - Excluded files: `*.pyc`
 - Last updated: 2026-01-22
+- Now includes UGR16 dataset and experiment 4 validation data
