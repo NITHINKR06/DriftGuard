@@ -1,6 +1,6 @@
 # DriftGuard
 
-An advanced network intrusion detection system using ensemble machine learning techniques with cross-dataset validation capabilities. DriftGuard focuses on detecting and analyzing dataset shift between different network traffic datasets (CICIDS2017 and UNSW-NB15).
+A network intrusion detection system that uses ensemble machine learning (Isolation Forest, Autoencoder, LSTM) to identify cyber attacks in network traffic. DriftGuard maintains strong performance across different network environments - validated on CICIDS2017, UNSW-NB15, and UGR16v2noIRC datasets.
 
 ## 📁 Project Structure
 
@@ -46,12 +46,17 @@ An advanced network intrusion detection system using ensemble machine learning t
 
 ## 🎯 Project Overview
 
-DriftGuard is a research-focused intrusion detection system that:
-- **Trains** ensemble ML models (Isolation Forest, Autoencoder, LSTM) on CICIDS2017 dataset
-- **Validates** cross-dataset performance on UNSW-NB15 and UGR16 datasets
-- **Analyzes** dataset shift and distribution changes across multiple environments
-- **Explains** predictions using SHAP values
-- **Scores** anomalies using weighted ensemble fusion
+DriftGuard is a network intrusion detection system that combines three AI models to detect network attacks:
+
+**What it does:**
+- **Detects** network attacks using ensemble ML models (Isolation Forest, Autoencoder, LSTM)
+- **Works** across different network environments without retraining
+- **Validates** on three datasets: CICIDS2017 (training), UNSW-NB15, and UGR16v2noIRC (validation)
+- **Explains** why traffic was flagged using SHAP analysis
+- **Scores** anomalies using weighted ensemble fusion (0.3 IF + 0.4 AE + 0.3 LSTM)
+- **Processes** ~2,380 network flows per second with low latency
+
+**Key advantage:** Most intrusion detection systems fail when deployed in different networks than where they were trained. DriftGuard maintains robust performance across diverse environments - from academic networks to real-world ISP traffic.
 
 ## 🚀 Getting Started
 
@@ -212,12 +217,15 @@ Located in `research/experiments/`:
 - Feature alignment required for compatibility
 - Preprocessed data available in `data/unsw/`
 
-### UGR16 (Real-World Validation)
-- University of Granada dataset
-- Additional real-world validation dataset
-- Multiple versions (v1, v2, v3, v4) with different configurations
-- Recent integration in Experiment 4 for robustness testing
-- Preprocessed predictions and scores in `data/ugr_*.npy`
+### UGR16v2noIRC (Real-World ISP Validation)
+- **Source:** University of Granada
+- **Version Used:** UGR16v2noIRC (IRC traffic removed for cleaner validation)
+- **Features:** 135 network flow features (truncated to 78, then aligned to 77 for CICIDS compatibility)
+- **Training set:** 98,262 samples (for distribution analysis only - NOT used for training)
+- **Test set:** 43,200 samples (100% attack traffic from real ISP network)
+- **Attack Types:** Multi-label (DoS, Port Scans, Botnet, Blacklist, Anomaly Detection)
+- **Experiment:** `research/experiments/exp4_ugr16_real_world_validation.ipynb`
+- **Outputs:** Preprocessed predictions and scores in `data/ugr_*.npy`
 
 ## � Future Enhancements
 
