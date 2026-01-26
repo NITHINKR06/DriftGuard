@@ -557,20 +557,24 @@
 
             <h3>UGR16 (Real-World Validation)</h3>
             <p><strong>Source:</strong> University of Granada</p>
-            <p><strong>Purpose:</strong> Additional real-world validation dataset</p>
+            <p><strong>Purpose:</strong> Additional real-world ISP network validation</p>
+            <p><strong>Version Used:</strong> UGR16v2noIRC (IRC traffic removed for cleaner validation)</p>
             <p><strong>Characteristics:</strong></p>
             <ul>
-                <li>Multiple versions (v1, v2, v3, v4) with different configurations</li>
-                <li>Real-world ISP network traffic</li>
-                <li>Recently integrated in Experiment 4 for robustness testing</li>
-                <li>Preprocessed predictions: <code>data/ugr_*.npy</code> files</li>
-                <li>Three-dataset validation ensures system robustness</li>
+                <li><strong>Features:</strong> 135 network flow features</li>
+                <li><strong>Training set:</strong> 98,262 samples (for distribution analysis only - NOT used for training models)</li>
+                <li><strong>Test set:</strong> 43,200 samples (used for validation)</li>
+                <li><strong>Attack Types:</strong> Multi-label classification (DoS, Port Scans, Botnet, Blacklist, Anomaly Detection)</li>
+                <li><strong>Attack Ratio:</strong> 100% attack traffic (real ISP network under attack scenarios)</li>
+                <li><strong>Label Types:</strong> labeldos, labelscan11, labelscan44, labelnerisbotnet, labelblacklist, labelanomalyidpscan, labelanomalysshscan, labelanomalyspam</li>
+                <li>Preprocessed predictions stored in: <code>data/ugr_*.npy</code> files</li>
+                <li>Validated in Experiment 4 (<code>research/experiments/exp4_ugr16_real_world_validation.ipynb</code>)</li>
             </ul>
 
             <div class="highlight">
-                <strong>🔬 Research Value:</strong> Using three different datasets (CICIDS2017, UNSW-NB15, UGR16) allows
-                us to measure how well our
-                models generalize across diverse network environments - a critical requirement for practical deployment.
+                <strong>🔬 Research Value:</strong> Using three different datasets (CICIDS2017, UNSW-NB15, UGR16v2noIRC) allows
+                us to measure how well our models generalize across diverse network environments - from academic networks to real-world ISP traffic.
+                This three-dataset validation demonstrates robustness beyond controlled lab conditions, a critical requirement for practical deployment.
             </div>
         </div>
 
