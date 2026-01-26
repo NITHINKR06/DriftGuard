@@ -367,7 +367,8 @@
             <div class="steps">
                 <div class="step">
                     <h3>Data Preprocessing</h3>
-                    <p><strong>Input:</strong> Raw network traffic CSV files (CICIDS2017 or UNSW-NB15)</p>
+                    <p><strong>Input:</strong> Raw network traffic CSV files (CICIDS2017, UNSW-NB15, or UGR16v2noIRC)
+                    </p>
                     <p><strong>Process:</strong></p>
                     <ul>
                         <li>Load CSV files using pandas</li>
@@ -437,18 +438,22 @@
 
                 <div class="step">
                     <h3>Cross-Dataset Validation</h3>
-                    <p><strong>Challenge:</strong> CICIDS2017 has 77 features, UNSW-NB15 has 49 features</p>
+                    <p><strong>Three-Dataset Strategy:</strong> Validate on UNSW-NB15 and UGR16v2noIRC without
+                        retraining</p>
+                    <p><strong>Challenge:</strong> Different feature spaces (CICIDS2017: 77, UNSW-NB15: 49, UGR16: 135)
+                    </p>
                     <p><strong>Feature Alignment Process:</strong></p>
                     <ul>
-                        <li>Map UNSW-NB15 features to CICIDS2017 feature space</li>
-                        <li>Missing features: zero-padding (28 features padded with 0)</li>
-                        <li>Apply CICIDS2017 scaler: use same mean/std from training</li>
+                        <li>Map validation dataset features to CICIDS2017 feature space (77 features)</li>
+                        <li>UNSW-NB15: zero-padding for 28 missing features</li>
+                        <li>UGR16v2noIRC: truncate from 135 to 78 features, then align to 77</li>
+                        <li>Apply CICIDS2017 scaler: use same mean/std from training (no data leakage)</li>
                     </ul>
                     <p><strong>Performance Measurement:</strong></p>
                     <ul>
-                        <li>Apply trained models to UNSW-NB15 test set</li>
-                        <li>Compare accuracy, precision, recall, F1-score</li>
-                        <li>Measure performance degradation vs. CICIDS2017</li>
+                        <li>Apply trained models to UNSW-NB15 and UGR16v2noIRC test sets</li>
+                        <li>Compare accuracy, precision, recall, F1-score across all three datasets</li>
+                        <li>Measure performance degradation vs. CICIDS2017 baseline</li>
                     </ul>
                     <p><strong>Distribution Shift Analysis:</strong></p>
                     <ul>
@@ -456,6 +461,7 @@
                                 0.05=significant shift)</li>
                         <li><strong>PSI:</strong> Population Stability Index (PSI > 0.2 = substantial shift)</li>
                         <li>Identify which features changed most between datasets</li>
+                        <li>Quantify distribution shift severity for academic vs. ISP networks</li>
                     </ul>
                 </div>
             </div>
@@ -562,19 +568,26 @@
             <p><strong>Characteristics:</strong></p>
             <ul>
                 <li><strong>Features:</strong> 135 network flow features</li>
-                <li><strong>Training set:</strong> 98,262 samples (for distribution analysis only - NOT used for training models)</li>
+                <li><strong>Training set:</strong> 98,262 samples (for distribution analysis only - NOT used for
+                    training models)</li>
                 <li><strong>Test set:</strong> 43,200 samples (used for validation)</li>
-                <li><strong>Attack Types:</strong> Multi-label classification (DoS, Port Scans, Botnet, Blacklist, Anomaly Detection)</li>
+                <li><strong>Attack Types:</strong> Multi-label classification (DoS, Port Scans, Botnet, Blacklist,
+                    Anomaly Detection)</li>
                 <li><strong>Attack Ratio:</strong> 100% attack traffic (real ISP network under attack scenarios)</li>
-                <li><strong>Label Types:</strong> labeldos, labelscan11, labelscan44, labelnerisbotnet, labelblacklist, labelanomalyidpscan, labelanomalysshscan, labelanomalyspam</li>
+                <li><strong>Label Types:</strong> labeldos, labelscan11, labelscan44, labelnerisbotnet, labelblacklist,
+                    labelanomalyidpscan, labelanomalysshscan, labelanomalyspam</li>
                 <li>Preprocessed predictions stored in: <code>data/ugr_*.npy</code> files</li>
-                <li>Validated in Experiment 4 (<code>research/experiments/exp4_ugr16_real_world_validation.ipynb</code>)</li>
+                <li>Validated in Experiment 4 (<code>research/experiments/exp4_ugr16_real_world_validation.ipynb</code>)
+                </li>
             </ul>
 
             <div class="highlight">
-                <strong>🔬 Research Value:</strong> Using three different datasets (CICIDS2017, UNSW-NB15, UGR16v2noIRC) allows
-                us to measure how well our models generalize across diverse network environments - from academic networks to real-world ISP traffic.
-                This three-dataset validation demonstrates robustness beyond controlled lab conditions, a critical requirement for practical deployment.
+                <strong>🔬 Research Value:</strong> Using three different datasets (CICIDS2017, UNSW-NB15, UGR16v2noIRC)
+                allows
+                us to measure how well our models generalize across diverse network environments - from academic
+                networks to real-world ISP traffic.
+                This three-dataset validation demonstrates robustness beyond controlled lab conditions, a critical
+                requirement for practical deployment.
             </div>
         </div>
 
@@ -707,10 +720,11 @@
             <p><strong>Deployment Scenario:</strong></p>
             <ul>
                 <li>Train on public datasets (CICIDS2017) without exposing private data</li>
-                <li>Validate on internal network (like we validated on UNSW-NB15)</li>
+                <li>Validate on internal network (like we validated on UNSW-NB15 and UGR16v2noIRC)</li>
                 <li>Analyze distribution shift to understand performance expectations</li>
                 <li>Fine-tune ensemble weights based on internal validation results</li>
-                <li>Deploy with confidence that cross-dataset performance was pre-tested</li>
+                <li>Deploy with confidence that three-dataset cross-validation was pre-tested</li>
+                <li>Proven to work across academic, research testbed, and real ISP environments</li>
             </ul>
         </div>
 
