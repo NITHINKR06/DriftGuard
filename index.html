@@ -240,15 +240,23 @@
         <div class="section">
             <h2>📋 Project Overview</h2>
 
-            <p><strong>DriftGuard</strong> is a research-focused network intrusion detection system (NIDS) that
-                addresses a critical challenge in cybersecurity: <strong>dataset shift</strong>. When machine learning
-                models are trained on one network environment (e.g., university network) and deployed in another (e.g.,
-                corporate network), their performance often degrades significantly due to differences in network traffic
-                patterns, applications, and user behaviors.</p>
+            <p><strong>DriftGuard</strong> is a network intrusion detection system that uses machine learning to
+                identify cyber attacks in network traffic. It combines three different AI models (Isolation Forest,
+                Autoencoder, and LSTM) to detect suspicious activity with high accuracy.</p>
 
-            <p style="margin-top: 1rem;">This project demonstrates that <strong>ensemble methods combining three
-                    different anomaly detection approaches</strong> can maintain robust performance across diverse
-                network environments, making intrusion detection more practical for real-world deployment.</p>
+            <p style="margin-top: 1rem;"><strong>What makes it special?</strong> Most intrusion detection systems fail
+                when deployed in different network environments than where they were trained. DriftGuard solves this by
+                using an ensemble approach that maintains strong performance across diverse networks - from university
+                campuses to corporate offices to real-world ISP traffic.</p>
+
+            <p style="margin-top: 1rem;"><strong>Key capabilities:</strong></p>
+            <ul>
+                <li>Detects network attacks using three complementary AI models working together</li>
+                <li>Works across different network environments without retraining</li>
+                <li>Explains why traffic was flagged as suspicious (using SHAP analysis)</li>
+                <li>Validated on three different datasets: CICIDS2017, UNSW-NB15, and UGR16v2noIRC</li>
+                <li>Processes ~2,380 network flows per second with low latency</li>
+            </ul>
 
             <!-- <div class="info-box">
                 <strong>📊 Research Goal:</strong> To build and validate an ensemble-based anomaly detection system that
