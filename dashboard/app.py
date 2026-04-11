@@ -1,15 +1,16 @@
 import sys
 import os
 
-# Allow importing from src/
-sys.path.append(os.path.abspath(".."))
+# Allow importing from src/ regardless of launch directory
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
 import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import streamlit.components.v1 as components
-from sklearn.cluster import KMeans
+from sklearn.cluster import MiniBatchKMeans
 from sklearn.decomposition import PCA
 
 from src.data_loader import load_final_outputs, load_all_model_scores
@@ -25,20 +26,6 @@ st.set_page_config(
 
 st.title("🛡️ ADAPT-SEC — SOC Dashboard")
 st.caption("Adaptive ML-based Cyber Threat Detection System")
-
-
-def trigger_auto_refresh(interval_seconds: int) -> None:
-    interval_ms = max(5, int(interval_seconds)) * 1000
-    components.html(
-        f"""
-        <script>
-            setTimeout(function() {{
-                window.parent.location.reload();
-            }}, {interval_ms});
-        </script>
-        """,
-        height=0,
-    )
 
 @st.cache_data(show_spinner=False)
 def load_dashboard_data() -> pd.DataFrame:
@@ -102,13 +89,31 @@ def severity_sort_order(series: pd.Series) -> pd.Series:
     return series.map(order).fillna(99)
 
 
-def add_behavior_clusters(dataframe: pd.DataFrame, n_clusters: int = 4) -> pd.DataFrame:
+def sample_rows(dataframe: pd.DataFrame, max_rows: int, seed: int = 42) -> pd.DataFrame:
+    if len(dataframe) <= max_rows:
+        return dataframe.copy()
+    return dataframe.sample(n=max_rows, random_state=seed)
+
+
+@st.cache_data(show_spinner=False)
+def add_behavior_clusters(
+    dataframe: pd.DataFrame,
+    n_clusters: int = 4,
+    max_rows: int = 12000,
+) -> pd.DataFrame:
+    dataframe = sample_rows(dataframe, max_rows=max_rows, seed=42)
     features = dataframe[["Risk Score", "IForest Norm", "Autoencoder Norm", "LSTM Norm"]].copy()
-    model = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+
+    model = MiniBatchKMeans(
+        n_clusters=n_clusters,
+        random_state=42,
+        batch_size=2048,
+        n_init=5,
+    )
     dataframe = dataframe.copy()
     dataframe["Behavior Cluster"] = model.fit_predict(features)
 
-    pca = PCA(n_components=2, random_state=42)
+    pca = PCA(n_components=2, random_state=42, svd_solver="randomized")
     reduced = pca.fit_transform(features)
     dataframe["Cluster X"] = reduced[:, 0]
     dataframe["Cluster Y"] = reduced[:, 1]
@@ -152,14 +157,23 @@ st.sidebar.subheader("Live Monitoring")
 enable_auto_refresh = st.sidebar.checkbox("Enable Auto Refresh", value=False)
 refresh_interval = st.sidebar.slider("Refresh Interval (seconds)", min_value=5, max_value=120, value=20, step=5)
 if st.sidebar.button("Refresh Now"):
+    st.rerun()
+
+if st.sidebar.button("Reload Data Cache"):
     st.cache_data.clear()
     st.rerun()
 
 cluster_count = st.sidebar.slider("Behavior Clusters", min_value=2, max_value=8, value=4, step=1)
 
+st.sidebar.subheader("Performance")
+cluster_sample_size = st.sidebar.slider("Cluster Sample Size", min_value=3000, max_value=30000, value=12000, step=1000)
+scatter_points = st.sidebar.slider("Scatter Plot Points", min_value=1500, max_value=15000, value=6000, step=500)
+
 if enable_auto_refresh:
-    st.cache_data.clear()
-    trigger_auto_refresh(refresh_interval)
+    if hasattr(st, "autorefresh"):
+        st.autorefresh(interval=refresh_interval * 1000, key="soc-auto-refresh")
+    else:
+        st.info("Auto refresh is unavailable in this Streamlit version. Use 'Refresh Now' instead.")
 
 filtered = df[df["Severity"].isin(selected_severity)].copy()
 filtered = filtered[(filtered["Risk Score"] >= selected_risk[0]) & (filtered["Risk Score"] <= selected_risk[1])]
@@ -227,7 +241,7 @@ with tab1:
                 "Ground Truth",
             ]
         ],
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
@@ -267,52 +281,74 @@ with tab2:
 
 with tab3:
     st.subheader("Attack Behavior Clustering")
-    cluster_df = add_behavior_clusters(filtered, n_clusters=cluster_count)
+    run_cluster_analysis = st.checkbox("Run clustering analysis", value=False)
 
-    cluster_summary = (
-        cluster_df.groupby("Behavior Cluster", as_index=False)
-        .agg(
-            Events=("Event ID", "count"),
-            Mean_Risk=("Risk Score", "mean"),
-            Attack_Rate=("Ground Truth", "mean"),
-            High_Risk_Count=("Severity", lambda x: int((x == "HIGH").sum())),
+    if not run_cluster_analysis:
+        st.info("Enable clustering analysis only when needed. This keeps the dashboard responsive.")
+    else:
+        cluster_df = add_behavior_clusters(
+            filtered,
+            n_clusters=cluster_count,
+            max_rows=cluster_sample_size,
         )
-        .sort_values("Mean_Risk", ascending=False)
-    )
-    cluster_summary["Attack_Rate"] = cluster_summary["Attack_Rate"] * 100
 
-    st.dataframe(cluster_summary, use_container_width=True, hide_index=True)
+        cluster_summary = (
+            cluster_df.groupby("Behavior Cluster", as_index=False)
+            .agg(
+                Events=("Event ID", "count"),
+                Mean_Risk=("Risk Score", "mean"),
+                Attack_Rate=("Ground Truth", "mean"),
+                High_Risk_Count=("Severity", lambda x: int((x == "HIGH").sum())),
+            )
+            .sort_values("Mean_Risk", ascending=False)
+        )
+        cluster_summary["Attack_Rate"] = cluster_summary["Attack_Rate"] * 100
 
-    fig = px.scatter(
-        cluster_df,
-        x="Cluster X",
-        y="Cluster Y",
-        color="Behavior Cluster",
-        size="Risk Score",
-        hover_data=["Event ID", "Severity", "Attack", "Risk Score"],
-        title="Behavior Cluster Map (PCA projection)",
-    )
-    fig.update_layout(height=520)
-    st.plotly_chart(fig, use_container_width=True)
+        st.caption(f"Clustering computed on {len(cluster_df):,} sampled rows.")
+        st.dataframe(cluster_summary, width="stretch", hide_index=True)
 
-    cluster_choice = st.selectbox(
-        "Inspect Cluster",
-        options=sorted(cluster_df["Behavior Cluster"].unique().tolist()),
-        index=0,
-        key="cluster_inspect",
-    )
-    cluster_slice = cluster_df[cluster_df["Behavior Cluster"] == cluster_choice].sort_values("Risk Score", ascending=False)
-    st.dataframe(
-        cluster_slice[["Event ID", "Event Time", "Risk Score", "Severity", "Attack", "IForest Norm", "Autoencoder Norm", "LSTM Norm"]].head(30),
-        use_container_width=True,
-        hide_index=True,
-    )
+        scatter_df = sample_rows(cluster_df, max_rows=scatter_points, seed=99)
+        fig = px.scatter(
+            scatter_df,
+            x="Cluster X",
+            y="Cluster Y",
+            color="Behavior Cluster",
+            size="Risk Score",
+            hover_data=["Event ID", "Severity", "Attack", "Risk Score"],
+            title="Behavior Cluster Map (PCA projection)",
+        )
+        fig.update_layout(height=520)
+        st.plotly_chart(fig, width="stretch")
+
+        cluster_choice = st.selectbox(
+            "Inspect Cluster",
+            options=sorted(cluster_df["Behavior Cluster"].unique().tolist()),
+            index=0,
+            key="cluster_inspect",
+        )
+        cluster_slice = cluster_df[cluster_df["Behavior Cluster"] == cluster_choice].sort_values("Risk Score", ascending=False)
+        st.dataframe(
+            cluster_slice[["Event ID", "Event Time", "Risk Score", "Severity", "Attack", "IForest Norm", "Autoencoder Norm", "LSTM Norm"]].head(30),
+            width="stretch",
+            hide_index=True,
+        )
 
 with tab4:
     st.subheader("Investigate Specific Alert")
 
-    event_ids = filtered["Event ID"].tolist()
-    selected_event = st.selectbox("Select Event ID", options=event_ids, index=0)
+    min_event_id = int(filtered["Event ID"].min())
+    max_event_id = int(filtered["Event ID"].max())
+    selected_event = st.number_input(
+        "Select Event ID",
+        min_value=min_event_id,
+        max_value=max_event_id,
+        value=min_event_id,
+        step=1,
+    )
+
+    if selected_event not in set(filtered["Event ID"]):
+        selected_event = int(filtered.iloc[0]["Event ID"])
+        st.caption(f"Showing nearest available filtered event: {selected_event}")
 
     alert_row = filtered[filtered["Event ID"] == selected_event].iloc[0]
 
