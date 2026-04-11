@@ -1,253 +1,253 @@
 # DriftGuard
 
-A network intrusion detection system that uses ensemble machine learning (Isolation Forest, Autoencoder, LSTM) to identify cyber attacks in network traffic. DriftGuard maintains strong performance across different network environments - validated on CICIDS2017, UNSW-NB15, and UGR16v2noIRC datasets.
+DriftGuard is a network intrusion detection system (IDS) that uses an ensemble of anomaly detection models to identify malicious network behavior under dataset shift.
 
-## 📁 Project Structure
+Unlike many IDS projects that only report strong results on one benchmark, DriftGuard is designed and validated for cross-environment reliability using:
 
-```
+- CICIDS2017 for training
+- UNSW-NB15 for cross-dataset validation
+- UGR16v2noIRC for real-world ISP-style validation
+
+## Why This Project Exists
+
+A common IDS failure pattern is:
+
+1. High accuracy in the training environment
+2. Significant degradation after deployment in a different network
+3. Increased false positives and missed true attacks
+
+DriftGuard addresses this by combining complementary detectors, quantifying distribution shift, and providing explanation artifacts for analyst trust.
+
+## What DriftGuard Solves
+
+- Detects anomalous network flows with an ensemble approach
+- Reduces dependence on a single model's blind spots
+- Provides calibrated risk scoring (0 to 1)
+- Supports severity-based triage (LOW, MEDIUM, HIGH)
+- Includes SHAP-based explainability for flagged traffic
+- Validates generalization across heterogeneous datasets
+
+## System Overview
+
+### Ensemble Models
+
+DriftGuard combines three anomaly engines:
+
+1. Isolation Forest (weight: 0.3)
+- Tree-based unsupervised outlier detection
+- Fast inference for point anomalies
+
+2. Autoencoder (weight: 0.4)
+- Dense reconstruction network: 77 -> 50 -> 25 -> 50 -> 77
+- Detects deviations via reconstruction error
+
+3. LSTM Autoencoder (weight: 0.3)
+- Bidirectional LSTM with sequence windows
+- Captures temporal and sequence-level anomalies
+
+### Risk Fusion
+
+Model outputs are normalized to [0, 1] and fused as:
+
+risk = 0.3 * IF + 0.4 * AE + 0.3 * LSTM
+
+### Severity Bands
+
+- HIGH: score >= 0.7
+- MEDIUM: 0.4 <= score < 0.7
+- LOW: score < 0.4
+
+## End-to-End Workflow
+
+1. Data ingestion and preprocessing
+- Load raw network flow CSV files
+- Clean missing/infinite values
+- Build and align feature matrices
+- Apply scaling and persist arrays
+
+2. Model training (benign-first)
+- Train all models on benign traffic patterns
+- Save model artifacts for reuse
+
+3. Inference and risk scoring
+- Generate per-sample model scores
+- Compute fused ensemble risk
+- Convert to severity labels
+
+4. Explainability
+- Use SHAP to attribute high-risk outputs to features
+- Produce analyst-friendly interpretation plots
+
+5. Cross-dataset validation
+- Evaluate transfer from CICIDS2017 to UNSW-NB15 and UGR16
+- Measure shift with KS/PSI statistics
+
+## Repository Structure
+
+```text
 .
-├── notebooks/              # Jupyter notebooks for model development
-│   ├── 01_data_exploration.ipynb          # CICIDS2017 dataset exploration
-│   ├── 02_feature_engineering.ipynb       # Feature engineering pipeline
-│   ├── 03_isolation_forest.ipynb          # Isolation Forest training
-│   ├── 04_autoencoder.ipynb               # Autoencoder training
-│   ├── 05_lstm_sequence_model.ipynb       # LSTM autoencoder training
-│   ├── 06_model_evaluation.ipynb          # Model evaluation metrics
-│   ├── 07_explainability_shap.ipynb       # SHAP-based model explainability
-│   └── 09_cross_dataset_validation.ipynb  # UNSW-NB15 cross-validation
-│
-├── research/               # Research experiments and analysis
-│   ├── experiments/
-│   │   ├── exp1_model_comparison.ipynb    # Comparative model analysis
-│   │   ├── exp2_false_positive_analysis.ipynb # False positive investigation
-│   │   ├── exp3_dataset_shift_analysis.ipynb  # Distribution shift analysis
-│   │   └── exp4_ugr16_real_world_validation.ipynb # UGR16 validation
-│   ├── results/            # Experiment results and figures
-│   └── notes.md            # Research notes
-│
-├── src/                    # Source code modules
-│   ├── data_loader.py      # Data loading and preprocessing utilities
-│   ├── features.py         # Feature engineering transformations
-│   ├── train_iforest.py    # Isolation Forest training module
-│   ├── train_autoencoder.py # Autoencoder training module
-│   ├── train_lstm.py       # LSTM autoencoder training module
-│   ├── risk_scoring.py     # Ensemble risk scoring and fusion
-│   ├── inference.py        # End-to-end model inference
-│   ├── plot_utils.py       # Visualization utilities
-│   └── fix_plot_saving.py  # Plot saving helper functions
-│
-├── dashboard/              # Dashboard application (future)
-├── data/                   # Dataset storage (CICIDS2017, UNSW-NB15, UGR16)
-├── models/                 # Saved trained models (.pkl, .keras)
-├── reports/                # Generated analysis reports
-├── results/                # Output results and visualizations
+├── dashboard/              # Streamlit SOC dashboard
+├── data/                   # Datasets and intermediate .npy artifacts
+├── docs/                   # Extended project documentation
+├── models/                 # Trained model files (.pkl, .keras)
+├── notebooks/              # Notebook-based research workflow
+├── reports/                # Generated reports and figures
+├── research/               # Experiment notebooks and notes
+├── results/                # Output artifacts
+├── src/                    # Core pipeline code
+├── filestr.md
+├── index.html
+├── requirements.txt
 └── README.md
 ```
 
-## 🎯 Project Overview
+### Important Source Modules
 
-DriftGuard is a network intrusion detection system that combines three AI models to detect network attacks:
+- src/data_loader.py: loading, cleaning, and final output utilities
+- src/features.py: feature engineering transformations
+- src/train_iforest.py: Isolation Forest training
+- src/train_autoencoder.py: dense autoencoder training
+- src/train_lstm.py: sequence model training
+- src/risk_scoring.py: score normalization, fusion, and severity mapping
+- src/inference.py: model loading and prediction API
+- dashboard/app.py: Streamlit SOC dashboard for risk monitoring
 
-**What it does:**
-- **Detects** network attacks using ensemble ML models (Isolation Forest, Autoencoder, LSTM)
-- **Works** across different network environments without retraining
-- **Validates** on three datasets: CICIDS2017 (training), UNSW-NB15, and UGR16v2noIRC (validation)
-- **Explains** why traffic was flagged using SHAP analysis
-- **Scores** anomalies using weighted ensemble fusion (0.3 IF + 0.4 AE + 0.3 LSTM)
-- **Processes** ~2,380 network flows per second with low latency
-
-**Key advantage:** Most intrusion detection systems fail when deployed in different networks than where they were trained. DriftGuard maintains robust performance across diverse environments - from academic networks to real-world ISP traffic.
-
-## 🚀 Getting Started
+## Setup
 
 ### Prerequisites
 
+- Python 3.10+ recommended
+- Sufficient RAM for dataset processing and deep learning training
+
+### Installation
+
 ```bash
-# Create a virtual environment
 python -m venv .venv
-
-# Activate virtual environment
-# On Windows:
 .venv\Scripts\activate
-# On macOS/Linux:
-source .venv/bin/activate
-
-# Install dependencies
 pip install -r requirements.txt
 ```
 
-### Required Dependencies
+## Quick Start
 
-- **Data Processing**: pandas, numpy, scipy
-- **Machine Learning**: scikit-learn
-- **Deep Learning**: tensorflow, keras
-- **Visualization**: matplotlib, seaborn, plotly
-- **Explainability**: shap
-- **Model Persistence**: joblib
-- **Development**: jupyter, pytest
-
-## 🔧 Usage
-
-### 1. Data Exploration
-
-Explore the CICIDS2017 dataset:
-```bash
-jupyter notebook notebooks/01_data_exploration.ipynb
-```
-
-### 2. Training Models
-
-Train individual models using the provided scripts:
+### 1) Train Models
 
 ```bash
-# Train Isolation Forest
 python src/train_iforest.py
-
-# Train Autoencoder
 python src/train_autoencoder.py
-
-# Train LSTM Autoencoder
 python src/train_lstm.py
 ```
 
-Models are saved to the `models/` directory:
-- `iforest_model.pkl` - Isolation Forest
-- `autoencoder.keras` - Autoencoder
-- `lstm_autoencoder.keras` - LSTM Autoencoder
+Expected artifacts in models/:
 
-### 3. Cross-Dataset Validation
+- iforest_model.pkl
+- autoencoder.keras
+- lstm_autoencoder.keras
 
-Validate models on UNSW-NB15 dataset:
+### 2) Run Evaluation and Validation
+
 ```bash
+jupyter notebook notebooks/06_model_evaluation.ipynb
 jupyter notebook notebooks/09_cross_dataset_validation.ipynb
 ```
 
-### 4. Making Predictions
-
-Use the inference module for end-to-end detection:
-
-```python
-from src.inference import AnomalyDetector
-
-# Initialize detector
-detector = AnomalyDetector()
-
-# Load trained models
-detector.load_model('iforest', 'models/iforest_model.pkl', 'sklearn')
-detector.load_model('autoencoder', 'models/autoencoder.keras', 'keras')
-detector.load_model('lstm', 'models/lstm_autoencoder.keras', 'keras')
-
-# Make predictions
-predictions = detector.predict(X_test)
-risk_scores = detector.get_risk_scores(X_test)
-```
-
-## 📊 Models
-
-### Isolation Forest
-- Unsupervised tree-based anomaly detection
-- Fast training and inference
-- Effective for high-dimensional network traffic data
-- Contamination factor: 0.1
-
-### Autoencoder
-- Dense neural network-based reconstruction
-- Architecture: 77 → 50 → 25 → 50 → 77
-- Learns normal traffic patterns via reconstruction error
-- Trained on benign traffic samples only
-
-### LSTM Autoencoder
-- Sequence-based temporal pattern learning
-- Bidirectional LSTM layers for time-series modeling
-- Window size: 10 timesteps
-- Captures temporal dependencies in network flows
-
-## 📈 Risk Scoring System
-
-DriftGuard uses a weighted ensemble approach combining all three models:
-
-```python
-from src.risk_scoring import RiskScorer
-
-# Initialize with custom weights
-scorer = RiskScorer(weights={
-    'iforest': 0.3, 
-    'autoencoder': 0.4, 
-    'lstm': 0.3
-})
-
-# Compute ensemble risk score
-ensemble_score = scorer.compute_ensemble_score(scores_dict)
-```
-
-Risk scores are normalized to [0, 1] where higher values indicate greater anomaly likelihood.
-
-## 🔍 Model Explainability
-
-SHAP (SHapley Additive exPlanations) provides feature-level interpretability:
+### 3) Run Explainability
 
 ```bash
 jupyter notebook notebooks/07_explainability_shap.ipynb
 ```
 
-Includes:
-- Waterfall plots for individual predictions
-- Feature importance ranking
-- False positive analysis
+### 4) Run Dashboard
 
-## 🧪 Research Experiments
+```bash
+streamlit run dashboard/app.py
+```
 
-Located in `research/experiments/`:
+## Inference API Example
 
-1. **Model Comparison** - Performance benchmarking across models
-2. **False Positive Analysis** - SHAP-based investigation of misclassifications
-3. **Dataset Shift Analysis** - Distribution comparison between CICIDS2017 and UNSW-NB15
-4. **UGR16 Real-World Validation** - Additional validation on UGR16 dataset
+```python
+from src.inference import AnomalyDetector
 
-## 📂 Datasets
+# Initialize detector
+adet = AnomalyDetector()
 
-### CICIDS2017 (Training)
-- Canadian Institute for Cybersecurity dataset
-- Modern network traffic with labeled attacks
-- Training set: benign traffic samples
+# Load trained models
+adet.load_model('iforest', 'models/iforest_model.pkl', 'sklearn')
+adet.load_model('autoencoder', 'models/autoencoder.keras', 'keras')
+adet.load_model('lstm', 'models/lstm_autoencoder.keras', 'keras')
 
-### UNSW-NB15 (Cross-Dataset Validation)
-- University of New South Wales dataset
-- Cross-dataset validation for generalization testing
-- Feature alignment required for compatibility
-- Preprocessed data available in `data/unsw/`
+# Predict and score
+preds = adet.predict(X_test)
+risk = adet.get_risk_scores(X_test)
+```
 
-### UGR16v2noIRC (Real-World ISP Validation)
-- **Source:** University of Granada
-- **Version Used:** UGR16v2noIRC (IRC traffic removed for cleaner validation)
-- **Features:** 135 network flow features (truncated to 78, then aligned to 77 for CICIDS compatibility)
-- **Training set:** 98,262 samples (for distribution analysis only - NOT used for training)
-- **Test set:** 43,200 samples (100% attack traffic from real ISP network)
-- **Attack Types:** Multi-label (DoS, Port Scans, Botnet, Blacklist, Anomaly Detection)
-- **Experiment:** `research/experiments/exp4_ugr16_real_world_validation.ipynb`
-- **Outputs:** Preprocessed predictions and scores in `data/ugr_*.npy`
+## Dashboard Behavior
 
-## � Future Enhancements
+The Streamlit dashboard:
 
-The following features are planned for future development and will be implemented in a Linux environment:
+- loads final risk outputs and labels
+- computes severity from risk scores
+- displays key SOC metrics
+- shows severity distribution
+- lists top risk events for triage
 
-### Zeek Real-Time Inference
-- **Integration with Zeek** (formerly Bro) network security monitor
-- Real-time network traffic analysis and anomaly detection
-- Live packet processing and feature extraction
-- Streaming prediction pipeline for production deployment
-- Requires: Zeek installation on Linux systems
+## Datasets
 
-### MITRE ATT&CK Auto-Mapping
-- **Automatic attack technique classification** based on detected anomalies
-- Mapping of network intrusions to MITRE ATT&CK framework tactics and techniques
-- Enhanced threat intelligence and incident response capabilities
-- Integration with security orchestration workflows
-- Support for ATT&CK Navigator visualization
+### CICIDS2017 (training baseline)
 
-> [!NOTE]
-> These features are currently in planning phase and will require a Linux deployment environment for production use. Development will begin after completing current research experiments on cross-dataset validation.
+- primary source for model fitting and scaler baseline
+- modern labeled network traffic benchmark
 
-## �📝 License
+### UNSW-NB15 (cross-dataset validation)
 
-This project is licensed under the MIT License.
+- used to test domain transfer from training distribution
+- requires feature alignment into the common feature space
+
+### UGR16v2noIRC (real-world ISP validation)
+
+- operationally realistic flow data from ISP-like traffic
+- used to stress-test transferability under stronger drift
+
+## Outputs and Artifacts
+
+Common outputs include:
+
+- trained model files in models/
+- processed arrays and scores in data/
+- figures and evaluation artifacts in reports/ and research/results/
+- dashboard-ready risk outputs consumed by dashboard/app.py
+
+## Current Limitations
+
+- Feature alignment across datasets can hide source-specific signals
+- Severity thresholds may require environment-specific tuning
+- Concept drift over time still requires periodic recalibration/retraining
+- Real-time packet pipeline integration is planned, not default
+
+## Roadmap
+
+### Near-term
+
+- strengthen cross-dataset calibration workflows
+- improve automated threshold tuning for SOC contexts
+- add robustness checks for evolving traffic profiles
+
+### Planned
+
+- Zeek-based real-time inference pipeline
+- MITRE ATT&CK tactic/technique mapping for alerts
+
+## Documentation
+
+For detailed technical writeups, see docs/:
+
+- PROJECT_OVERVIEW.md
+- 02_ARCHITECTURE.md
+- 05_IMPLEMENTATION.md
+- 06_MODELS.md
+- 08_CROSS_DATASET_VALIDATION.md
+- 09_EXPLAINABILITY.md
+- 10_VISUALIZATION_DASHBOARD.md
+
+## License
+
+MIT License

@@ -1,675 +1,855 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="DriftGuard - Network Intrusion Detection System">
-    <title>DriftGuard - Project Overview</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DriftGuard — Network IDS</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg: #f7f6f2;
+      --surface: #ffffff;
+      --border: #e5e2d9;
+      --text: #1a1915;
+      --muted: #6b6860;
+      --accent: #1a4ed8;
+      --accent-light: #eff4ff;
+      --accent-border: #c7d7f8;
+      --green: #166534;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --amber: #92400e;
+      --amber-bg: #fffbeb;
+      --amber-border: #fde68a;
+      --red: #991b1b;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(247,246,242,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+    .nav-brand {
+      font-family: 'DM Mono', monospace;
+      font-size: 14px; font-weight: 500;
+      color: var(--text); text-decoration: none;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-brand .shield {
+      width: 20px; height: 20px;
+      background: var(--accent);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 10px;
+    }
+    .nav-links {
+      display: flex; gap: 28px; list-style: none;
+    }
+    .nav-links a {
+      font-size: 13px; color: var(--muted);
+      text-decoration: none; font-weight: 500;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; background: var(--green-bg);
+      color: var(--green); border: 1px solid var(--green-border);
+      padding: 2px 10px; border-radius: 999px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 860px; margin: 0 auto;
+      padding: 80px 40px 60px;
+    }
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: block;
+      width: 24px; height: 1px; background: var(--accent);
+    }
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(36px, 5vw, 54px);
+      line-height: 1.15; letter-spacing: -.01em;
+      margin-bottom: 20px; color: var(--text);
+    }
+    h1 em { font-style: italic; color: var(--accent); }
+    .hero-sub {
+      font-size: 16px; color: var(--muted);
+      max-width: 580px; line-height: 1.7;
+      margin-bottom: 36px;
+    }
+    .hero-stats {
+      display: flex; gap: 40px; flex-wrap: wrap;
+    }
+    .stat { display: flex; flex-direction: column; gap: 2px; }
+    .stat-val {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px; color: var(--text);
+    }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none; border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ── LAYOUT ── */
+    .main { max-width: 860px; margin: 0 auto; padding: 0 40px 80px; }
+
+    /* ── SECTIONS ── */
+    .section { padding: 56px 0; border-bottom: 1px solid var(--border); }
+    .section:last-child { border-bottom: none; }
+
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 26px; margin-bottom: 14px;
+      line-height: 1.25;
+    }
+    h3 {
+      font-size: 14px; font-weight: 600;
+      margin-bottom: 8px; color: var(--text);
+    }
+    p { color: var(--muted); margin-bottom: 12px; }
+    p:last-child { margin-bottom: 0; }
+    ul { color: var(--muted); padding-left: 18px; }
+    ul li { margin-bottom: 5px; }
+
+    /* ── CALLOUT ── */
+    .callout {
+      border-radius: 8px; padding: 16px 20px;
+      margin: 20px 0; font-size: 14px;
+    }
+    .callout.blue { background: var(--accent-light); border: 1px solid var(--accent-border); color: var(--accent); }
+    .callout.green { background: var(--green-bg); border: 1px solid var(--green-border); color: var(--green); }
+    .callout.amber { background: var(--amber-bg); border: 1px solid var(--amber-border); color: var(--amber); }
+    .callout strong { display: block; margin-bottom: 4px; }
+
+    /* ── PROBLEM BOX ── */
+    .problem-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      margin: 24px 0;
+    }
+    .problem-card {
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 20px;
+      background: var(--surface);
+    }
+    .problem-card .icon {
+      font-size: 18px; margin-bottom: 10px;
+    }
+    .problem-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .problem-card p { font-size: 13px; margin: 0; }
+
+    /* ── MODELS GRID ── */
+    .models-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; margin: 24px 0;
+    }
+    .model-card {
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 22px;
+      background: var(--surface);
+      position: relative; overflow: hidden;
+    }
+    .model-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+    }
+    .model-card.if::before { background: #6366f1; }
+    .model-card.ae::before { background: var(--accent); }
+    .model-card.lstm::before { background: #0891b2; }
+
+    .model-weight {
+      font-family: 'DM Mono', monospace;
+      font-size: 28px; font-weight: 500;
+      color: var(--text); line-height: 1;
+      margin-bottom: 4px;
+    }
+    .model-weight.if { color: #6366f1; }
+    .model-weight.ae { color: var(--accent); }
+    .model-weight.lstm { color: #0891b2; }
+
+    .model-name { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+    .model-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+    /* ── PIPELINE ── */
+    .pipeline { margin: 24px 0; }
+    .pipeline-step {
+      display: flex; gap: 20px; position: relative;
+      padding-bottom: 28px;
+    }
+    .pipeline-step:last-child { padding-bottom: 0; }
+    .step-left {
+      display: flex; flex-direction: column; align-items: center;
+      flex-shrink: 0; width: 36px;
+    }
+    .step-num {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--surface); border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500;
+      color: var(--muted); flex-shrink: 0;
+      z-index: 1;
+    }
+    .step-line {
+      flex: 1; width: 1px; background: var(--border);
+      margin: 4px 0;
+    }
+    .pipeline-step:last-child .step-line { display: none; }
+    .step-body {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px 22px;
+      flex: 1; margin-bottom: 0;
+    }
+    .step-body h3 { margin-bottom: 6px; }
+    .step-body p { font-size: 13px; }
+    .step-body ul { font-size: 13px; margin-top: 8px; }
+
+    /* ── DATASETS ── */
+    .datasets-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; margin: 24px 0;
+    }
+    .dataset-card {
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 20px; background: var(--surface);
+    }
+    .dataset-badge {
+      display: inline-block;
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .badge-train { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .badge-val { background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent-border); }
+    .badge-real { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+    .dataset-name { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+    .dataset-meta { font-size: 12px; color: var(--muted); }
+    .dataset-meta span { display: block; margin-bottom: 3px; }
+
+    /* ── METRICS TABLE ── */
+    .metrics-table {
+      width: 100%; border-collapse: collapse;
+      margin: 20px 0; font-size: 14px;
+    }
+    .metrics-table th {
+      text-align: left; font-size: 11px; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase;
+      color: var(--muted); padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .metrics-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .metrics-table tr:last-child td { border-bottom: none; }
+    .metrics-table td:first-child { color: var(--text); font-weight: 500; }
+    .metrics-table td:last-child {
+      font-family: 'DM Mono', monospace; font-size: 13px;
+      color: var(--accent);
+    }
+
+    /* ── TECH TAGS ── */
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .tag {
+      font-family: 'DM Mono', monospace; font-size: 12px;
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 4px 10px; border-radius: 6px; color: var(--muted);
+    }
+
+    /* ── FINDING CARDS ── */
+    .findings { display: grid; gap: 12px; margin: 20px 0; }
+    .finding {
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 16px 20px; background: var(--surface);
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .finding-num {
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      color: var(--accent); font-weight: 500;
+      background: var(--accent-light); border: 1px solid var(--accent-border);
+      padding: 2px 8px; border-radius: 4px; flex-shrink: 0; margin-top: 1px;
+    }
+    .finding p { font-size: 13px; margin: 0; }
+
+    /* ── SEVERITY ── */
+    .severity-row {
+      display: flex; gap: 12px; margin: 16px 0; flex-wrap: wrap;
+    }
+    .sev {
+      flex: 1; min-width: 120px;
+      border-radius: 8px; padding: 14px 16px;
+      font-size: 13px;
+    }
+    .sev .sev-label { font-weight: 600; font-size: 12px; margin-bottom: 4px; }
+    .sev.high { background: var(--red-bg); border: 1px solid var(--red-border); color: var(--red); }
+    .sev.med { background: var(--amber-bg); border: 1px solid var(--amber-border); color: var(--amber); }
+    .sev.low { background: var(--green-bg); border: 1px solid var(--green-border); color: var(--green); }
+
+    /* ── FILE TREE ── */
+    .file-tree {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 20px 24px;
+      font-family: 'DM Mono', monospace; font-size: 12.5px;
+      color: var(--muted); line-height: 1.9;
+      margin: 20px 0; overflow-x: auto;
+      white-space: pre;
+    }
+    .file-tree .dir { color: var(--text); font-weight: 500; }
+    .file-tree .note { color: #aaa; }
+
+    /* ── CODE ── */
+    pre {
+      background: #1a1915; border-radius: 10px;
+      padding: 20px 24px; overflow-x: auto;
+      margin: 16px 0;
+    }
+    code {
+      font-family: 'DM Mono', monospace;
+      font-size: 12.5px; color: #a8b4c8;
+      line-height: 1.75;
+    }
+    pre code .kw { color: #79b8ff; }
+    pre code .str { color: #9ecbff; }
+    pre code .cm { color: #6a737d; }
+
+    /* ── FUTURE ── */
+    .future-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; margin: 20px 0;
+    }
+    .future-card {
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 22px; background: var(--surface);
+    }
+    .future-card h3 { font-size: 14px; margin-bottom: 8px; }
+    .future-card ul { font-size: 13px; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 860px; margin: 0 auto;
+    }
+    .footer-left {
+      font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted);
+    }
+    .footer-right { font-size: 12px; color: var(--muted); }
+
+    /* ── ANIM ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero { animation: fadeUp .5s ease both; }
+    .section { animation: fadeUp .5s ease both; animation-delay: .1s; }
+
+    @media (max-width: 640px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .hero, .main { padding-left: 20px; padding-right: 20px; }
+      .models-grid, .datasets-grid, .problem-grid, .future-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <h1>🛡️ DriftGuard</h1>
-        <p>Advanced Network Intrusion Detection System using Ensemble Machine Learning with Cross-Dataset Validation and
-            Explainable AI</p>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#">
+    <span class="shield">▲</span>
+    DriftGuard
+  </a>
+  <ul class="nav-links">
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#models">Models</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#datasets">Datasets</a></li>
+    <li><a href="#results">Results</a></li>
+  </ul>
+  <span class="nav-badge">Research Project</span>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="overview">
+  <div class="hero-eyebrow">Network Intrusion Detection System</div>
+  <h1>Detect real threats<br><em>beyond the training lab</em></h1>
+  <p class="hero-sub">DriftGuard is built to solve one core IDS failure: models that look accurate in research but break in production. It combines three anomaly detectors, calibrates their outputs into a single risk score, and validates generalization across independent datasets before deployment.</p>
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-val">2,380</span>
+      <span class="stat-label">Flow records / second</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val">3</span>
+      <span class="stat-label">Anomaly engines</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val">3</span>
+      <span class="stat-label">Environments validated</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val">77</span>
+      <span class="stat-label">Normalized features</span>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="main">
+
+  <!-- PROBLEM -->
+  <section class="section">
+    <div class="section-label">The Problem We Solve</div>
+    <h2>Reliable intrusion detection under dataset shift</h2>
+    <p>Most ML IDS pipelines are optimized for benchmark scores, not operational reliability. The exact problem DriftGuard solves is <strong>performance collapse when traffic patterns, feature distributions, and attack mix change after deployment</strong>.</p>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="icon">🎓</div>
+        <h4>What Typical Research Reports</h4>
+        <p>High in-distribution accuracy when training and testing are from the same source. This number rarely reflects production behavior.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">🏢</div>
+        <h4>What Security Teams Actually Face</h4>
+        <p>Model drift, noisy alerts, and missed attacks in new networks. Analysts lose time on false positives while true incidents compete for attention.</p>
+      </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Project Overview -->
-        <div class="section">
-            <h2>📋 Project Overview</h2>
+    <div class="callout green">
+      <strong>DriftGuard's solution</strong>
+      Train on benign behavior, detect deviations with three complementary models, fuse into one calibrated risk score, explain every high-risk alert with SHAP, and validate on independent datasets (CICIDS2017 → UNSW-NB15 → UGR16) without retraining.
+    </div>
+  </section>
 
-            <p><strong>DriftGuard</strong> is a network intrusion detection system that uses machine learning to
-                identify cyber attacks in network traffic. It combines three different AI models (Isolation Forest,
-                Autoencoder, and LSTM) to detect suspicious activity with high accuracy.</p>
+  <!-- ARCHITECTURE -->
+  <section class="section" id="architecture">
+    <div class="section-label">Project Architecture</div>
+    <h2>How the complete project is organized</h2>
+    <p>DriftGuard is structured as a reproducible research-to-deployment pipeline: datasets and preprocessing artifacts feed model training, trained checkpoints feed inference and risk scoring, and generated outputs drive dashboard and explainability workflows.</p>
 
-            <p style="margin-top: 1rem;"><strong>What makes it special?</strong> Most intrusion detection systems fail
-                when deployed in different network environments than where they were trained. DriftGuard solves this by
-                using an ensemble approach that maintains strong performance across diverse networks - from university
-                campuses to corporate offices to real-world ISP traffic.</p>
+    <div class="findings">
+      <div class="finding">
+        <span class="finding-num">A1</span>
+        <p><strong>Core code modules:</strong> <code>src/data_loader.py</code>, <code>src/features.py</code>, <code>src/train_iforest.py</code>, <code>src/train_autoencoder.py</code>, <code>src/train_lstm.py</code>, <code>src/inference.py</code>, and <code>src/risk_scoring.py</code>.</p>
+      </div>
+      <div class="finding">
+        <span class="finding-num">A2</span>
+        <p><strong>Model artifacts:</strong> Trained checkpoints are persisted under <code>models/</code> (Isolation Forest <code>.pkl</code>, Autoencoder and LSTM <code>.keras</code>) and reused for inference without retraining.</p>
+      </div>
+      <div class="finding">
+        <span class="finding-num">A3</span>
+        <p><strong>Experiment layer:</strong> Notebooks in <code>notebooks/</code> and <code>research/experiments/</code> cover feature engineering, model evaluation, SHAP analysis, false-positive analysis, and cross-dataset validation.</p>
+      </div>
+      <div class="finding">
+        <span class="finding-num">A4</span>
+        <p><strong>Operations layer:</strong> <code>dashboard/app.py</code> consumes final risk outputs, severity labels, and ground truth to provide SOC-facing KPIs, alert distribution, and top-risk event views.</p>
+      </div>
+    </div>
 
-            <p style="margin-top: 1rem;"><strong>Key capabilities:</strong></p>
-            <ul>
-                <li>Detects network attacks using three complementary AI models working together</li>
-                <li>Works across different network environments without retraining</li>
-                <li>Explains why traffic was flagged as suspicious (using SHAP analysis)</li>
-                <li>Validated on three different datasets: CICIDS2017, UNSW-NB15, and UGR16v2noIRC</li>
-                <li>Processes ~2,380 network flows per second with low latency</li>
-            </ul>
+    <div class="callout blue">
+      <strong>Why this architecture matters</strong>
+      The same trained components are reused consistently across evaluation and dashboard views, so reported results and operational visualization stay aligned with the model pipeline.
+    </div>
+  </section>
 
-            <!-- <div class="info-box">
-                <strong>📊 Research Goal:</strong> To build and validate an ensemble-based anomaly detection system that
-                generalizes across different network datasets (CICIDS2017 → UNSW-NB15) while providing interpretable
-                predictions for security analysts.
-            </div> -->
+  <!-- MODELS -->
+  <section class="section" id="models">
+    <div class="section-label">How Detection Works</div>
+    <h2>Three detectors, one decision score</h2>
+    <p>Each engine captures a different failure mode in network behavior. Their outputs are scaled to the same range and combined, so no single model dominates on its own.</p>
+
+    <div class="models-grid">
+      <div class="model-card if">
+        <div class="model-weight if">30%</div>
+        <div class="model-name">Isolation Forest</div>
+        <div class="model-desc">Catches point anomalies quickly using random partitioning trees. Useful for unusual one-off flow records that differ sharply from benign baselines.</div>
+      </div>
+      <div class="model-card ae">
+        <div class="model-weight ae">40%</div>
+        <div class="model-name">Autoencoder</div>
+        <div class="model-desc">Learns compact representations of normal traffic (77→50→25→50→77). High reconstruction error indicates suspicious behavior not seen during benign training.</div>
+      </div>
+      <div class="model-card lstm">
+        <div class="model-weight lstm">30%</div>
+        <div class="model-name">LSTM Autoencoder</div>
+        <div class="model-desc">Models short traffic sequences with BiLSTM windows (length 10). Detects temporal attack patterns such as scans and staged probing missed by single-flow models.</div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top: 32px;">Risk Classification</div>
+    <div class="severity-row">
+      <div class="sev high">
+        <div class="sev-label">HIGH ≥ 0.7</div>
+        Immediate triage: likely malicious or strongly abnormal traffic
+      </div>
+      <div class="sev med">
+        <div class="sev-label">MEDIUM 0.4–0.7</div>
+        Analyst review queue: suspicious but not yet critical
+      </div>
+      <div class="sev low">
+        <div class="sev-label">LOW &lt; 0.4</div>
+        Log and monitor: low evidence of malicious behavior
+      </div>
+    </div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section class="section" id="pipeline">
+    <div class="section-label">System Workflow</div>
+    <h2>Exactly how the pipeline runs</h2>
+    <p>Input is tabular flow data. Output is per-flow prediction, risk score, and optional explanation artifact for analyst review.</p>
+
+    <div class="pipeline">
+
+      <div class="pipeline-step">
+        <div class="step-left">
+          <div class="step-num">01</div>
+          <div class="step-line"></div>
         </div>
-
-        <!-- The Problem -->
-        <div class="section">
-            <h2>🎯 Problem Statement</h2>
-
-            <h3>The Challenge of Dataset Shift</h3>
-            <p>Traditional intrusion detection systems face a fundamental limitation:</p>
-
-            <div class="highlight">
-                <strong>❌ The Problem:</strong> Machine learning models assume that training data and deployment data
-                come from the same distribution. In cybersecurity, this assumption is almost never true.
-            </div>
-
-            <h4>Real-World Scenario:</h4>
-            <ul>
-                <li><strong>Training Environment:</strong> University network with academic applications, 8am-5pm peak
-                    hours, student behavior patterns</li>
-                <li><strong>Deployment Environment:</strong> Corporate network with business applications, 24/7
-                    operations, employee behavior patterns</li>
-                <li><strong>Result:</strong> Model trained on university traffic flags normal corporate behavior as
-                    anomalous → thousands of false positives → alert fatigue → security teams ignore alerts → real
-                    attacks go undetected</li>
-            </ul>
-
-            <h3>Performance Degradation</h3>
-            <p>Typical scenario when deploying ML-based NIDS:</p>
-            <ul>
-                <li>Lab performance (same dataset): <strong>95% accuracy</strong></li>
-                <li>Production performance (different environment): <strong>60% accuracy</strong></li>
-                <li>False positive rate in production: <strong>1000+ alerts per day</strong></li>
-                <li>Security analyst capacity: <strong>~50 investigations per day</strong></li>
-            </ul>
-
-            <div class="success-box">
-                <strong>✅ DriftGuard's Solution:</strong> Use ensemble of complementary models + cross-dataset
-                validation + distribution shift analysis + explainable AI to maintain performance across environments
-                and build analyst trust.
-            </div>
+        <div class="step-body">
+          <h3>1) Ingest and standardize features</h3>
+          <p>Raw CSV traffic logs are transformed into a consistent 77-feature matrix. Missing/infinite values are repaired, scaling is applied, and arrays are persisted as <code>.npy</code> for reproducible training and fast inference.</p>
         </div>
+      </div>
 
-        <!-- Three Detection Models -->
-        <div class="section">
-            <h2>🤖 Three Complementary Detection Engines</h2>
-
-            <p>DriftGuard combines three different anomaly detection approaches. Each model has different strengths and
-                captures different types of anomalies:</p>
-
-            <div class="grid">
-                <div class="card">
-                    <h3>🌲 Isolation Forest (30% weight)</h3>
-                    <p><strong>Type:</strong> Tree-based anomaly detection</p>
-                    <p><strong>How it works:</strong> Builds random decision trees that isolate anomalies by randomly
-                        selecting features and split values. Anomalies are easier to isolate (require fewer splits) than
-                        normal points.</p>
-                    <p><strong>Strengths:</strong></p>
-                    <ul>
-                        <li>Fast training and inference</li>
-                        <li>Works well with high-dimensional data (77 features)</li>
-                        <li>No assumptions about data distribution</li>
-                    </ul>
-                    <p><strong>Training:</strong> Only on benign traffic from CICIDS2017</p>
-                    <p><strong>Output:</strong> Anomaly score (negative values, more negative = more anomalous)</p>
-                </div>
-
-                <div class="card">
-                    <h3>🧠 Autoencoder (40% weight)</h3>
-                    <p><strong>Type:</strong> Neural network reconstruction-based detection</p>
-                    <p><strong>Architecture:</strong> Dense layers: 77 → 50 → 25 (bottleneck) → 50 → 77</p>
-                    <p><strong>How it works:</strong> Learns to compress and reconstruct normal network traffic. Benign
-                        traffic reconstructs well (low error), attacks reconstruct poorly (high error).</p>
-                    <p><strong>Strengths:</strong></p>
-                    <ul>
-                        <li>Captures complex non-linear patterns</li>
-                        <li>Learns feature interactions automatically</li>
-                        <li>Highest weight in ensemble (most reliable)</li>
-                    </ul>
-                    <p><strong>Training:</strong> Only on benign traffic, minimizes reconstruction error (MSE)</p>
-                    <p><strong>Output:</strong> Reconstruction error (higher = more anomalous)</p>
-                </div>
-
-                <div class="card">
-                    <h3>⏱️ LSTM Autoencoder (30% weight)</h3>
-                    <p><strong>Type:</strong> Sequence-based temporal detection</p>
-                    <p><strong>Architecture:</strong> Bidirectional LSTM layers with encoder-decoder structure</p>
-                    <p><strong>How it works:</strong> Processes sequences of 10 consecutive network flows. Learns
-                        temporal patterns and dependencies. Detects anomalies in time-series behavior.</p>
-                    <p><strong>Strengths:</strong></p>
-                    <ul>
-                        <li>Captures temporal dependencies</li>
-                        <li>Detects sequence-based attacks (e.g., port scans)</li>
-                        <li>Models network flow evolution over time</li>
-                    </ul>
-                    <p><strong>Training:</strong> On benign traffic sequences (10-timestep windows)</p>
-                    <p><strong>Output:</strong> Sequence prediction error (higher = more anomalous)</p>
-                </div>
-            </div>
-
-            <div class="info-box">
-                <strong>💡 Why Ensemble?</strong> Different models catch different types of anomalies. Isolation Forest
-                excels at point anomalies, Autoencoder catches feature-based anomalies, and LSTM detects temporal
-                sequence anomalies. Combining them provides robust detection across diverse attack types.
-            </div>
+      <div class="pipeline-step">
+        <div class="step-left">
+          <div class="step-num">02</div>
+          <div class="step-line"></div>
         </div>
-
-        <!-- How It Works -->
-        <div class="section">
-            <h2>⚙️ Complete System Workflow</h2>
-
-            <div class="steps">
-                <div class="step">
-                    <h3>Data Preprocessing</h3>
-                    <p><strong>Input:</strong> Raw network traffic CSV files (CICIDS2017, UNSW-NB15, or UGR16v2noIRC)
-                    </p>
-                    <p><strong>Process:</strong></p>
-                    <ul>
-                        <li>Load CSV files using pandas</li>
-                        <li>Clean data: remove infinite values, handle NaNs</li>
-                        <li>Extract 77 network features (packet size, duration, flags, protocol info, etc.)</li>
-                        <li>Apply StandardScaler (normalize to mean=0, std=1)</li>
-                        <li>Save preprocessed data as .npy files for fast loading</li>
-                    </ul>
-                    <p><strong>Output:</strong> X_phase2.npy (feature matrix), y_phase2.npy (labels)</p>
-                </div>
-
-                <div class="step">
-                    <h3>Model Training</h3>
-                    <p><strong>Training Strategy:</strong> Train all models on <strong>benign traffic only</strong> from
-                        CICIDS2017</p>
-                    <p><strong>Why benign only?</strong> Anomaly detection approach - models learn what "normal" looks
-                        like, then flag deviations as potential attacks</p>
-                    <p><strong>Training Details:</strong></p>
-                    <ul>
-                        <li><strong>Isolation Forest:</strong> 100 trees, contamination=0.1, random_state=42</li>
-                        <li><strong>Autoencoder:</strong> 50 epochs, batch_size=256, Adam optimizer, MSE loss</li>
-                        <li><strong>LSTM:</strong> 30 epochs, sequence_length=10, Bidirectional LSTM layers</li>
-                    </ul>
-                    <p><strong>Output:</strong> Saved models (iforest_model.pkl, autoencoder.keras,
-                        lstm_autoencoder.keras)</p>
-                    <p><strong>Total Training Time:</strong> ~65 minutes on 2M+ training samples</p>
-                </div>
-
-                <div class="step">
-                    <h3>Ensemble Risk Scoring</h3>
-                    <p><strong>Problem:</strong> Each model outputs different scales:</p>
-                    <ul>
-                        <li>Isolation Forest: negative values (e.g., -0.5 to -0.1)</li>
-                        <li>Autoencoder: positive MSE (e.g., 0.01 to 2.5)</li>
-                        <li>LSTM: positive MSE (e.g., 0.05 to 3.2)</li>
-                    </ul>
-                    <p><strong>Solution - Normalization:</strong> Transform all scores to [0, 1] range where 1 = most
-                        anomalous</p>
-                    <p><strong>Formula:</strong> normalized_score = (score - min) / (max - min)</p>
-                    <p><strong>Weighted Fusion:</strong></p>
-                    <ul>
-                        <li>risk_score = 0.3 × IF_norm + 0.4 × AE_norm + 0.3 × LSTM_norm</li>
-                        <li>Autoencoder gets highest weight (40%) as it's most reliable</li>
-                    </ul>
-                    <p><strong>Severity Classification:</strong></p>
-                    <ul>
-                        <li>HIGH risk: score ≥ 0.7 (immediate investigation)</li>
-                        <li>MEDIUM risk: 0.4 ≤ score < 0.7 (review when time permits)</li>
-                        <li>LOW risk: score < 0.4 (likely benign, log only)</li>
-                    </ul>
-                </div>
-
-                <div class="step">
-                    <h3>Explainability with SHAP</h3>
-                    <p><strong>Purpose:</strong> Help security analysts understand <em>why</em> traffic was flagged</p>
-                    <p><strong>Method:</strong> SHAP (SHapley Additive exPlanations) - game theory approach to explain
-                        predictions</p>
-                    <p><strong>What it provides:</strong></p>
-                    <ul>
-                        <li>Feature importance: which network features contributed most to the anomaly score</li>
-                        <li>Waterfall plots: visual breakdown showing how each feature pushed score up/down</li>
-                        <li>Individual explanations: separate analysis for each flagged sample</li>
-                    </ul>
-                    <p><strong>Example Insight:</strong> "This traffic was flagged because: destination port unusual
-                        (SHAP +0.3), packet size abnormal (SHAP +0.2), connection duration too short (SHAP +0.15)"</p>
-                </div>
-
-                <div class="step">
-                    <h3>Cross-Dataset Validation</h3>
-                    <p><strong>Three-Dataset Strategy:</strong> Validate on UNSW-NB15 and UGR16v2noIRC without
-                        retraining</p>
-                    <p><strong>Challenge:</strong> Different feature spaces (CICIDS2017: 77, UNSW-NB15: 49, UGR16: 135)
-                    </p>
-                    <p><strong>Feature Alignment Process:</strong></p>
-                    <ul>
-                        <li>Map validation dataset features to CICIDS2017 feature space (77 features)</li>
-                        <li>UNSW-NB15: zero-padding for 28 missing features</li>
-                        <li>UGR16v2noIRC: truncate from 135 to 78 features, then align to 77</li>
-                        <li>Apply CICIDS2017 scaler: use same mean/std from training (no data leakage)</li>
-                    </ul>
-                    <p><strong>Performance Measurement:</strong></p>
-                    <ul>
-                        <li>Apply trained models to UNSW-NB15 and UGR16v2noIRC test sets</li>
-                        <li>Compare accuracy, precision, recall, F1-score across all three datasets</li>
-                        <li>Measure performance degradation vs. CICIDS2017 baseline</li>
-                    </ul>
-                    <p><strong>Distribution Shift Analysis:</strong></p>
-                    <ul>
-                        <li><strong>KS Test:</strong> Kolmogorov-Smirnov test for each feature (p-value <
-                                0.05=significant shift)</li>
-                        <li><strong>PSI:</strong> Population Stability Index (PSI > 0.2 = substantial shift)</li>
-                        <li>Identify which features changed most between datasets</li>
-                        <li>Quantify distribution shift severity for academic vs. ISP networks</li>
-                    </ul>
-                </div>
-            </div>
+        <div class="step-body">
+          <h3>2) Learn normal behavior from benign traffic</h3>
+          <p>All models are trained only on benign CICIDS2017 records. This makes the system attack-type agnostic: it detects deviation from normality, including novel attacks not seen as labels during training.</p>
+          <ul>
+            <li>Isolation Forest: 100 trees, contamination 0.1</li>
+            <li>Autoencoder: 50 epochs, batch 256, Adam / MSE</li>
+            <li>LSTM: 30 epochs, sequence length 10, BiLSTM layers</li>
+          </ul>
         </div>
+      </div>
 
-        <!-- Project Structure -->
-        <div class="section">
-            <h2>📁 Project Structure & Files</h2>
-
-            <p>The project follows a modular architecture with clear separation of concerns:</p>
-
-            <div class="file-structure">
-                DriftGuard/
-                ├── data/ # Dataset storage
-                │ ├── CICIDS2017/ # Training dataset (CSV files)
-                │ ├── UNSW-NB15/ # Validation dataset (CSV files)
-                │ ├── UGR16/ # Real-world validation dataset
-                │ ├── unsw/ # UNSW-NB15 preprocessed data
-                │ ├── X_phase2.npy # Preprocessed features (77 dims)
-                │ ├── y_phase2.npy # Labels (0=benign, 1=attack)
-                │ └── ugr_*.npy # UGR16 predictions and scores
-                │
-                ├── models/ # Trained models
-                │ ├── iforest_model.pkl # Isolation Forest (1.8 MB)
-                │ ├── autoencoder.keras # Autoencoder (200 KB)
-                │ └── lstm_autoencoder.keras # LSTM model (936 KB)
-                │
-                ├── src/ # Production code modules
-                │ ├── data_loader.py # Centralized data loading
-                │ ├── features.py # Feature engineering pipeline
-                │ ├── train_iforest.py # Train Isolation Forest
-                │ ├── train_autoencoder.py # Train Autoencoder
-                │ ├── train_lstm.py # Train LSTM Autoencoder
-                │ ├── risk_scoring.py # Ensemble fusion & scoring
-                │ ├── inference.py # End-to-end detection pipeline
-                │ └── plot_utils.py # Visualization utilities
-                │
-                ├── notebooks/ # Jupyter notebooks
-                │ ├── 01_data_exploration.ipynb # CICIDS2017 EDA
-                │ ├── 02_feature_engineering.ipynb # Feature pipeline
-                │ ├── 03_isolation_forest.ipynb # Train IF model
-                │ ├── 04_autoencoder.ipynb # Train AE model
-                │ ├── 05_lstm_sequence_model.ipynb # Train LSTM model
-                │ ├── 06_model_evaluation.ipynb # Metrics & eval
-                │ ├── 07_explainability_shap.ipynb # SHAP analysis
-                │ └── 09_cross_dataset_validation.ipynb # UNSW-NB15 testing
-                │
-                ├── research/ # Research experiments
-                │ ├── experiments/
-                │ │ ├── exp1_model_comparison.ipynb # Compare 3 models
-                │ │ ├── exp2_false_positive_analysis.ipynb # FP investigation
-                │ │ ├── exp3_dataset_shift_analysis.ipynb # KS/PSI analysis
-                │ │ └── exp4_ugr16_real_world_validation.ipynb # UGR16 validation
-                │ └── results/ # Figures, plots, metrics
-                │
-                ├── docs/ # Comprehensive documentation
-                │ ├── 00_INDEX.md # Documentation index
-                │ ├── 01_INTRODUCTION.md # Problem statement
-                │ ├── 02_ARCHITECTURE.md # System design
-                │ ├── 03_DATASETS.md # Data description
-                │ ├── 06_MODELS.md # Model details
-                │ └── ... (14 total docs)
-                │
-                ├── dashboard/ # Streamlit visualization app
-                ├── reports/ # Generated reports
-                ├── README.md # Quick start guide
-                ├── requirements.txt # Python dependencies
-                └── PROJECT_OVERVIEW.html # This file
-            </div>
+      <div class="pipeline-step">
+        <div class="step-left">
+          <div class="step-num">03</div>
+          <div class="step-line"></div>
         </div>
-
-        <!-- Datasets -->
-        <div class="section">
-            <h2>📊 Datasets Used</h2>
-
-            <h3>CICIDS2017 (Training Dataset)</h3>
-            <p><strong>Source:</strong> Canadian Institute for Cybersecurity</p>
-            <p><strong>Purpose:</strong> Primary training dataset</p>
-            <p><strong>Characteristics:</strong></p>
-            <ul>
-                <li>Modern network traffic collected over 5 days</li>
-                <li>Contains multiple attack types: Brute Force, DoS, DDoS, Web attacks, Infiltration, Botnet</li>
-                <li>77 extracted features per network flow</li>
-                <li>~2.8M total samples, ~2M benign samples used for training</li>
-                <li>Labeled data (0=benign, 1=attack)</li>
-            </ul>
-
-            <h3>UNSW-NB15 (Cross-Dataset Validation)</h3>
-            <p><strong>Source:</strong> University of New South Wales</p>
-            <p><strong>Purpose:</strong> Cross-dataset validation (test generalization)</p>
-            <p><strong>Characteristics:</strong></p>
-            <ul>
-                <li>Different network environment from CICIDS2017</li>
-                <li>49 native features (mapped to 77 for compatibility)</li>
-                <li>Different attack types: Exploits, Reconnaissance, Shellcode, Worms</li>
-                <li>Used to test if models generalize to new environments</li>
-                <li>Preprocessed data stored in <code>data/unsw/</code></li>
-            </ul>
-
-            <h3>UGR16 (Real-World Validation)</h3>
-            <p><strong>Source:</strong> University of Granada</p>
-            <p><strong>Purpose:</strong> Additional real-world ISP network validation</p>
-            <p><strong>Version Used:</strong> UGR16v2noIRC (IRC traffic removed for cleaner validation)</p>
-            <p><strong>Characteristics:</strong></p>
-            <ul>
-                <li><strong>Features:</strong> 135 network flow features</li>
-                <li><strong>Training set:</strong> 98,262 samples (for distribution analysis only - NOT used for
-                    training models)</li>
-                <li><strong>Test set:</strong> 43,200 samples (used for validation)</li>
-                <li><strong>Attack Types:</strong> Multi-label classification (DoS, Port Scans, Botnet, Blacklist,
-                    Anomaly Detection)</li>
-                <li><strong>Attack Ratio:</strong> 100% attack traffic (real ISP network under attack scenarios)</li>
-                <li><strong>Label Types:</strong> labeldos, labelscan11, labelscan44, labelnerisbotnet, labelblacklist,
-                    labelanomalyidpscan, labelanomalysshscan, labelanomalyspam</li>
-                <li>Preprocessed predictions stored in: <code>data/ugr_*.npy</code> files</li>
-                <li>Validated in Experiment 4 (<code>research/experiments/exp4_ugr16_real_world_validation.ipynb</code>)
-                </li>
-            </ul>
-
-            <div class="highlight">
-                <strong>🔬 Research Value:</strong> Using three different datasets (CICIDS2017, UNSW-NB15, UGR16v2noIRC)
-                allows
-                us to measure how well our models generalize across diverse network environments - from academic
-                networks to real-world ISP traffic.
-                This three-dataset validation demonstrates robustness beyond controlled lab conditions, a critical
-                requirement for practical deployment.
-            </div>
+        <div class="step-body">
+          <h3>3) Fuse model outputs into one risk score</h3>
+          <p>Each model emits an anomaly score in a different numeric range. Scores are normalized to [0,1] and combined by weighted averaging:<br>
+          <code>risk = 0.3×IF + 0.4×AE + 0.3×LSTM</code></p>
         </div>
+      </div>
 
-        <!-- Key Features -->
-        <div class="section">
-            <h2>✨ Key Features & Capabilities</h2>
-
-            <h3>1. Cross-Dataset Generalization</h3>
-            <p>Models trained on CICIDS2017 are validated on UNSW-NB15 to ensure they work in different network
-                environments, not just the training environment.</p>
-
-            <h3>2. Ensemble Fusion</h3>
-            <p>Combines predictions from three complementary models using weighted averaging. Each model's strength
-                compensates for others' weaknesses.</p>
-
-            <h3>3. Distribution Shift Analysis</h3>
-            <p>Quantifies how much datasets differ using statistical tests:</p>
-            <ul>
-                <li><strong>Kolmogorov-Smirnov (KS) test:</strong> Measures if two features have same distribution</li>
-                <li><strong>Population Stability Index (PSI):</strong> Quantifies magnitude of shift (0-0.1: stable,
-                    0.1-0.2: moderate, >0.2: significant)</li>
-            </ul>
-
-            <h3>4. SHAP Explainability</h3>
-            <p>Every prediction comes with an explanation showing which network features contributed to the anomaly
-                score. Builds trust with security analysts.</p>
-
-            <h3>5. Production-Ready Architecture</h3>
-            <ul>
-                <li>Modular design: each component is independent and reusable</li>
-                <li>Saved preprocessing artifacts (scalers, normalizers, feature lists)</li>
-                <li>Version-controlled models via Git LFS</li>
-                <li>Batch processing support for large-scale inference</li>
-            </ul>
-
-            <h3>6. Performance Metrics</h3>
-            <table>
-                <tr>
-                    <th>Metric</th>
-                    <th>Value</th>
-                </tr>
-                <tr>
-                    <td>Inference Speed</td>
-                    <td>~2,380 samples/second (single-threaded)</td>
-                </tr>
-                <tr>
-                    <td>Latency</td>
-                    <td>420ms per 1000 samples</td>
-                </tr>
-                <tr>
-                    <td>Model Size</td>
-                    <td>3 MB total (all 3 models)</td>
-                </tr>
-                <tr>
-                    <td>Memory Usage</td>
-                    <td>~4 GB RAM during training</td>
-                </tr>
-                <tr>
-                    <td>Training Time</td>
-                    <td>~65 minutes (all 3 models on 2M samples)</td>
-                </tr>
-            </table>
+      <div class="pipeline-step">
+        <div class="step-left">
+          <div class="step-num">04</div>
+          <div class="step-line"></div>
         </div>
-
-        <!-- Technology Stack -->
-        <div class="section">
-            <h2>🛠️ Technology Stack</h2>
-
-            <h3>Core Libraries</h3>
-            <div class="tech-tags">
-                <span class="tag">Python 3.x</span>
-                <span class="tag">Pandas</span>
-                <span class="tag">NumPy</span>
-                <span class="tag">Scikit-learn</span>
-                <span class="tag">TensorFlow</span>
-                <span class="tag">Keras</span>
-                <span class="tag">SHAP</span>
-            </div>
-
-            <h3>Visualization</h3>
-            <div class="tech-tags">
-                <span class="tag">Matplotlib</span>
-                <span class="tag">Seaborn</span>
-                <span class="tag">Plotly</span>
-                <span class="tag">Streamlit</span>
-            </div>
-
-            <h3>Development Tools</h3>
-            <div class="tech-tags">
-                <span class="tag">Jupyter Notebook</span>
-                <span class="tag">Git & Git LFS</span>
-                <span class="tag">Joblib</span>
-                <span class="tag">SciPy</span>
-            </div>
-
-            <h4>Why These Technologies?</h4>
-            <ul>
-                <li><strong>Scikit-learn:</strong> Industry-standard for Isolation Forest and preprocessing</li>
-                <li><strong>TensorFlow/Keras:</strong> Best support for Autoencoder and LSTM architectures</li>
-                <li><strong>SHAP:</strong> State-of-the-art explainability for ML models</li>
-                <li><strong>Git LFS:</strong> Handles large model files and datasets efficiently</li>
-            </ul>
+        <div class="step-body">
+          <h3>4) Explain high-risk alerts for analysts</h3>
+          <p>For selected alerts, SHAP generates feature-attribution plots that show why the score is high. This converts model output into actionable context (which ports, flags, rates, or timing signals drove the alert).</p>
         </div>
+      </div>
 
-        <!-- Use Cases -->
-        <div class="section">
-            <h2>🎯 Use Cases & Applications</h2>
-
-            <h3>🏢 Security Operations Centers (SOC)</h3>
-            <p><strong>Problem:</strong> SOC analysts receive thousands of alerts daily, most are false positives</p>
-            <p><strong>DriftGuard Solution:</strong></p>
-            <ul>
-                <li>Ensemble scoring reduces false positives by combining multiple models</li>
-                <li>SHAP explanations help analysts quickly understand why traffic was flagged</li>
-                <li>Severity classification (HIGH/MEDIUM/LOW) helps prioritize investigations</li>
-                <li>Cross-dataset validation ensures it works in your specific network environment</li>
-            </ul>
-
-            <h3>🔬 Research & Academia</h3>
-            <p><strong>Research Topics:</strong></p>
-            <ul>
-                <li>Cross-dataset generalization in cybersecurity ML</li>
-                <li>Ensemble methods for anomaly detection</li>
-                <li>Dataset shift quantification (KS tests, PSI)</li>
-                <li>Explainable AI for security applications</li>
-                <li>Comparison of tree-based vs neural network approaches</li>
-            </ul>
-
-            <h3>🏭 Enterprise Network Security</h3>
-            <p><strong>Deployment Scenario:</strong></p>
-            <ul>
-                <li>Train on public datasets (CICIDS2017) without exposing private data</li>
-                <li>Validate on internal network (like we validated on UNSW-NB15 and UGR16v2noIRC)</li>
-                <li>Analyze distribution shift to understand performance expectations</li>
-                <li>Fine-tune ensemble weights based on internal validation results</li>
-                <li>Deploy with confidence that three-dataset cross-validation was pre-tested</li>
-                <li>Proven to work across academic, research testbed, and real ISP environments</li>
-            </ul>
+      <div class="pipeline-step">
+        <div class="step-left">
+          <div class="step-num">05</div>
+          <div class="step-line"></div>
         </div>
+        <div class="step-body">
+          <h3>5) Validate transferability before deployment</h3>
+          <p>Generalization is tested on UNSW-NB15 (49 features padded to 77) and UGR16 (135 features aligned to 77). The same training scaler is reused to avoid leakage and simulate realistic deployment transfer.</p>
+          <ul>
+            <li>KS test per feature (p &lt; 0.05 = significant shift)</li>
+            <li>PSI per feature (&gt; 0.2 = substantial shift)</li>
+          </ul>
+        </div>
+      </div>
 
-        <!-- Getting Started -->
-        <div class="section">
-            <h2>🚀 Getting Started</h2>
+    </div>
+  </section>
 
-            <div class="steps">
-                <div class="step">
-                    <h3>Clone Repository</h3>
-                    <p><code>git clone &lt;repository-url&gt;</code></p>
-                    <p><code>cd await</code></p>
-                </div>
+  <!-- DATASETS -->
+  <section class="section" id="datasets">
+    <div class="section-label">Validation Design</div>
+    <h2>Why three datasets are necessary</h2>
+    <p>The system is intentionally evaluated across heterogeneous sources to answer one question: does detection survive environmental change, not just benchmark replay?</p>
 
-                <div class="step">
-                    <h3>Setup Environment</h3>
-                    <p><strong>Create virtual environment:</strong></p>
-                    <p><code>python -m venv .venv</code></p>
-                    <p><strong>Activate (Windows):</strong></p>
-                    <p><code>.venv\Scripts\activate</code></p>
-                    <p><strong>Install dependencies:</strong></p>
-                    <p><code>pip install -r requirements.txt</code></p>
-                </div>
+    <div class="datasets-grid">
+      <div class="dataset-card">
+        <div class="dataset-badge badge-train">Training</div>
+        <div class="dataset-name">CICIDS2017</div>
+        <div class="dataset-meta">
+          <span>Primary training baseline (benign-focused learning)</span>
+          <span>~2.8M samples · 77 features</span>
+          <span>Reference space for scaler and model fit</span>
+        </div>
+      </div>
+      <div class="dataset-card">
+        <div class="dataset-badge badge-val">Validation</div>
+        <div class="dataset-name">UNSW-NB15</div>
+        <div class="dataset-meta">
+          <span>Cross-domain academic validation</span>
+          <span>49 native features → mapped to 77</span>
+          <span>Checks robustness to different feature definitions</span>
+        </div>
+      </div>
+      <div class="dataset-card">
+        <div class="dataset-badge badge-real">Real-world</div>
+        <div class="dataset-name">UGR16v2</div>
+        <div class="dataset-meta">
+          <span>Operational ISP traffic scenario</span>
+          <span>43,200 test samples · 135→77 features</span>
+          <span>Stress test for deployment-like drift conditions</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
-                <div class="step">
-                    <h3>Explore Data</h3>
-                    <p>Start with data exploration notebook:</p>
-                    <p><code>jupyter notebook notebooks/01_data_exploration.ipynb</code></p>
-                    <p>This walks through CICIDS2017 dataset characteristics, features, and distributions.</p>
-                </div>
+  <!-- RESULTS -->
+  <section class="section" id="results">
+    <div class="section-label">What We Proved</div>
+    <h2>Results tied to the original problem</h2>
 
-                <div class="step">
-                    <h3>Train Models</h3>
-                    <p><strong>Option A:</strong> Use Jupyter notebooks (recommended for learning):</p>
-                    <ul>
-                        <li><code>notebooks/03_isolation_forest.ipynb</code></li>
-                        <li><code>notebooks/04_autoencoder.ipynb</code></li>
-                        <li><code>notebooks/05_lstm_sequence_model.ipynb</code></li>
-                    </ul>
-                    <p><strong>Option B:</strong> Use Python scripts (faster):</p>
-                    <ul>
-                        <li><code>python src/train_iforest.py</code></li>
-                        <li><code>python src/train_autoencoder.py</code></li>
-                        <li><code>python src/train_lstm.py</code></li>
-                    </ul>
-                </div>
+    <div class="findings">
+      <div class="finding">
+        <span class="finding-num">F1</span>
+        <p><strong>Generalization gain:</strong> The ensemble maintained materially better cross-dataset detection quality than any single model, reducing the failure risk of model-specific blind spots.</p>
+      </div>
+      <div class="finding">
+        <span class="finding-num">F2</span>
+        <p><strong>Feature stability insight:</strong> Protocol-level features (ports/flags) stayed more stable across environments than heavily derived throughput features, informing safer feature selection.</p>
+      </div>
+      <div class="finding">
+        <span class="finding-num">F3</span>
+        <p><strong>Shift is quantifiable:</strong> PSI and KS statistics identified distribution changes before deployment, enabling pre-launch risk assessment instead of reactive firefighting.</p>
+      </div>
+      <div class="finding">
+        <span class="finding-num">F4</span>
+        <p><strong>Operational relevance:</strong> Validation across CICIDS2017 → UNSW-NB15 → UGR16 demonstrates that the pipeline is designed for transfer, not only for one closed benchmark.</p>
+      </div>
+    </div>
 
-                <div class="step">
-                    <h3>Evaluate & Validate</h3>
-                    <p><strong>Model evaluation on CICIDS2017:</strong></p>
-                    <p><code>jupyter notebook notebooks/06_model_evaluation.ipynb</code></p>
-                    <p><strong>Cross-dataset validation on UNSW-NB15:</strong></p>
-                    <p><code>jupyter notebook notebooks/09_cross_dataset_validation.ipynb</code></p>
-                    <p><strong>Explainability analysis:</strong></p>
-                    <p><code>jupyter notebook notebooks/07_explainability_shap.ipynb</code></p>
-                </div>
+    <div class="section-label" style="margin-top: 32px;">Performance</div>
+    <table class="metrics-table">
+      <thead>
+        <tr><th>Metric</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Inference Speed</td><td>~2,380 samples / sec</td></tr>
+        <tr><td>Latency</td><td>420 ms / 1,000 samples</td></tr>
+        <tr><td>Total Model Size</td><td>~3 MB</td></tr>
+        <tr><td>Training Time</td><td>~65 min on 2M+ samples</td></tr>
+        <tr><td>RAM (Training)</td><td>~4 GB</td></tr>
+      </tbody>
+    </table>
+    <div class="callout blue">
+      <strong>What this means in practice</strong>
+      DriftGuard is not just an anomaly score generator. It is a deployment-aware IDS workflow that prioritizes stable detection, interpretable alerts, and measurable transfer risk before rollout.
+    </div>
+  </section>
 
-                <div class="step">
-                    <h3>Make Predictions</h3>
-                    <p>Use the inference module for production-style detection:</p>
-                    <pre><code>from src.inference import AnomalyDetector
+  <!-- STACK -->
+  <section class="section">
+    <div class="section-label">Technology</div>
+    <h2>Stack</h2>
+    <h3>Core ML</h3>
+    <div class="tags">
+      <span class="tag">Python 3</span>
+      <span class="tag">Scikit-learn</span>
+      <span class="tag">TensorFlow</span>
+      <span class="tag">Keras</span>
+      <span class="tag">SHAP</span>
+      <span class="tag">Pandas</span>
+      <span class="tag">NumPy</span>
+      <span class="tag">SciPy</span>
+    </div>
+    <h3 style="margin-top: 20px;">Visualization & Dev</h3>
+    <div class="tags">
+      <span class="tag">Streamlit</span>
+      <span class="tag">Matplotlib</span>
+      <span class="tag">Plotly</span>
+      <span class="tag">Jupyter</span>
+      <span class="tag">Git LFS</span>
+      <span class="tag">Joblib</span>
+    </div>
+    <h3 style="margin-top: 20px;">Dashboard Integration</h3>
+    <p>The Streamlit dashboard (in <code>dashboard/app.py</code>) loads final outputs, computes severity bands from risk scores, and presents SOC-style KPIs:</p>
+    <ul>
+      <li>Total events processed</li>
+      <li>High-risk alert count</li>
+      <li>Detected attack count using available labels</li>
+      <li>Severity distribution and top-risk event table</li>
+    </ul>
+  </section>
+
+  <!-- USAGE -->
+  <section class="section">
+    <div class="section-label">How To Use</div>
+    <h2>Run inference and consume outputs</h2>
+    <p>Inference returns anomaly predictions and continuous risk scores. In operations, map high-risk outputs to analyst queues and attach SHAP explanations for investigation context.</p>
+    <pre><code><span class="kw">from</span> src.inference <span class="kw">import</span> AnomalyDetector
 
 detector = AnomalyDetector()
-detector.load_model('iforest', 'models/iforest_model.pkl', 'sklearn')
-detector.load_model('autoencoder', 'models/autoencoder.keras', 'keras')
-detector.load_model('lstm', 'models/lstm_autoencoder.keras', 'keras')
+detector.load_model(<span class="str">'iforest'</span>,     <span class="str">'models/iforest_model.pkl'</span>,      <span class="str">'sklearn'</span>)
+detector.load_model(<span class="str">'autoencoder'</span>, <span class="str">'models/autoencoder.keras'</span>,       <span class="str">'keras'</span>)
+detector.load_model(<span class="str">'lstm'</span>,        <span class="str">'models/lstm_autoencoder.keras'</span>,  <span class="str">'keras'</span>)
 
 predictions = detector.predict(X_test)
 risk_scores = detector.get_risk_scores(X_test)</code></pre>
-                </div>
-            </div>
-        </div>
 
-        <!-- Research Contributions -->
-        <div class="section">
-            <h2>🔬 Research Contributions</h2>
-
-            <h3>Academic Contributions</h3>
-            <ul>
-                <li><strong>Quantitative Cross-Dataset Analysis:</strong> First comprehensive KS/PSI statistical
-                    analysis between CICIDS2017 and UNSW-NB15, identifying which features are stable vs. shifting across
-                    environments</li>
-                <li><strong>Ensemble Architecture for Dataset Shift:</strong> Novel weighted fusion approach that
-                    combines tree-based, neural, and sequence models for robust cross-environment performance</li>
-                <li><strong>Explainability Framework:</strong> Integration of SHAP values with ensemble IDS, bridging
-                    the gap between ML models and security analyst workflows</li>
-            </ul>
-
-            <h3>Practical Contributions</h3>
-            <ul>
-                <li><strong>Production-Ready Codebase:</strong> Modular, scalable architecture with clear separation
-                    between training and inference</li>
-                <li><strong>Reproducible Experiments:</strong> All code, notebooks, and model artifacts are
-                    version-controlled and documented</li>
-                <li><strong>Open-Source Implementation:</strong> Complete working system available for researchers and
-                    practitioners</li>
-            </ul>
-
-            <h3>Key Findings</h3>
-            <div class="highlight">
-                <p><strong>Finding 1:</strong> Ensemble methods maintain ~15-20% higher accuracy on cross-dataset
-                    validation compared to individual models across three different datasets</p>
-                <p><strong>Finding 2:</strong> SHAP explanations revealed that protocol-level features (ports, flags)
-                    are more stable across datasets than derivative features (bytes/s, packets/s)</p>
-                <p><strong>Finding 3:</strong> Dataset shift is quantifiable - PSI and KS tests can predict which
-                    features will cause performance degradation in new environments</p>
-                <p><strong>Finding 4:</strong> Three-dataset validation (CICIDS2017 → UNSW-NB15 → UGR16) demonstrates
-                    that ensemble approaches generalize well to diverse real-world environments</p>
-            </div>
-        </div>
-
-        <!-- Future Work -->
-        <div class="section">
-            <h2>🚀 Future Enhancements</h2>
-
-            <h3>🔮 Zeek Real-Time Inference (Linux Deployment)</h3>
-            <p><strong>Goal:</strong> Move from offline batch processing to live network monitoring</p>
-            <p><strong>Planned Features:</strong></p>
-            <ul>
-                <li>Integration with Zeek (formerly Bro) network security monitor</li>
-                <li>Real-time feature extraction from live network packets</li>
-                <li>Streaming prediction pipeline with sub-second latency</li>
-                <li>Alert generation and forwarding to SIEM systems</li>
-                <li>Dashboard for live monitoring of network anomalies</li>
-            </ul>
-            <p><strong>Requirements:</strong> Linux environment with Zeek installed, production network tap/mirror port
-            </p>
-
-            <h3>🗺️ MITRE ATT&CK Auto-Mapping</h3>
-            <p><strong>Goal:</strong> Automatically classify detected anomalies into MITRE ATT&CK tactics and techniques
-            </p>
-            <p><strong>Planned Features:</strong></p>
-            <ul>
-                <li>Map network anomalies to specific ATT&CK techniques (e.g., T1046 Network Service Scanning)</li>
-                <li>Provide tactic-level classification (Initial Access, Execution, Persistence, etc.)</li>
-                <li>Integration with ATT&CK Navigator for visualization</li>
-                <li>Enhanced threat intelligence reports for security teams</li>
-                <li>Automated incident response playbook selection based on detected technique</li>
-            </ul>
-
-            <div class="info-box">
-                <strong>📅 Timeline:</strong> Both features are in planning phase. Development will begin after
-                completing current research validation experiments and publishing results.
-            </div>
-        </div>
+    <div class="callout green">
+      <strong>Output contract</strong>
+      <span><strong>predict()</strong> returns anomaly labels. <strong>get_risk_scores()</strong> returns calibrated scores in [0,1] that map directly to LOW, MEDIUM, and HIGH severity bands.</span>
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <p><strong>🛡️ DriftGuard</strong> - Advanced Network Intrusion Detection System</p>
-        <p style="margin-top: 0.5rem; opacity: 0.8;">An ensemble machine learning approach with cross-dataset validation
-            and explainable AI</p>
-        <p style="margin-top: 0.5rem; font-size: 0.9rem;">MIT License | Research Project</p>
-    </footer>
-</body>
+    <div class="section-label" style="margin-top: 32px;">Reproducible Run Flow</div>
+    <p>Use this sequence to reproduce the complete project workflow from setup to validation:</p>
+    <pre><code><span class="cm"># 1) Environment setup (Windows)</span>
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
 
+<span class="cm"># 2) Train all three models</span>
+python src/train_iforest.py
+python src/train_autoencoder.py
+python src/train_lstm.py
+
+<span class="cm"># 3) Evaluate / validate in notebooks</span>
+jupyter notebook notebooks/06_model_evaluation.ipynb
+jupyter notebook notebooks/09_cross_dataset_validation.ipynb
+
+<span class="cm"># 4) Explainability analysis</span>
+jupyter notebook notebooks/07_explainability_shap.ipynb
+
+<span class="cm"># 5) Launch SOC dashboard</span>
+streamlit run dashboard/app.py</code></pre>
+
+    <div class="callout amber">
+      <strong>Expected artifacts after a full run</strong>
+      Saved models in <code>models/</code>, preprocessed arrays and scores in <code>data/</code>, and experiment figures/results under <code>research/results/</code> and <code>reports/figures/</code>.
+    </div>
+
+    <div class="file-tree"><span class="dir">DriftGuard/</span>
+├── <span class="dir">data/</span>          <span class="note"># CICIDS2017 · UNSW-NB15 · UGR16 + .npy files</span>
+├── <span class="dir">models/</span>        <span class="note"># iforest.pkl · autoencoder.keras · lstm.keras</span>
+├── <span class="dir">src/</span>           <span class="note"># data_loader · features · train_* · inference · risk_scoring</span>
+├── <span class="dir">notebooks/</span>     <span class="note"># 01_eda → 09_cross_dataset_validation</span>
+├── <span class="dir">research/</span>      <span class="note"># experiments · results · distribution shift analysis</span>
+├── <span class="dir">dashboard/</span>     <span class="note"># Streamlit app</span>
+└── <span class="dir">docs/</span>          <span class="note"># 14 markdown docs</span></div>
+  </section>
+
+  <!-- LIMITATIONS -->
+  <section class="section">
+    <div class="section-label">Known Limits</div>
+    <h2>Where this system can still fail</h2>
+    <p>DriftGuard improves cross-environment robustness, but it is still an anomaly-based IDS and has known constraints that matter for deployment planning:</p>
+    <div class="findings">
+      <div class="finding">
+        <span class="finding-num">L1</span>
+        <p><strong>Feature alignment tradeoff:</strong> Mapping 49 or 135 native features to the shared 77-feature space can discard source-specific signals.</p>
+      </div>
+      <div class="finding">
+        <span class="finding-num">L2</span>
+        <p><strong>Concept drift over time:</strong> Traffic baselines evolve, so periodic recalibration or retraining is still required for long-running deployments.</p>
+      </div>
+      <div class="finding">
+        <span class="finding-num">L3</span>
+        <p><strong>Threshold sensitivity:</strong> Severity cutoffs (0.4 / 0.7) balance recall and analyst workload; they should be tuned to each SOC risk appetite.</p>
+      </div>
+      <div class="finding">
+        <span class="finding-num">L4</span>
+        <p><strong>Current mode is mostly batch:</strong> Real-time packet/flow ingestion is planned (Zeek integration) and not yet the default production path.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUTURE -->
+  <section class="section">
+    <div class="section-label">Roadmap</div>
+    <h2>What comes next</h2>
+    <div class="future-grid">
+      <div class="future-card">
+        <h3>🔴 Zeek Real-Time Inference</h3>
+        <p style="font-size:13px; margin-bottom: 10px;">Extend current batch pipeline into continuous packet-to-flow monitoring for SOC operations.</p>
+        <ul>
+          <li>Zeek integration for live packet feature extraction</li>
+          <li>Streaming prediction pipeline, sub-second latency</li>
+          <li>SIEM alert forwarding</li>
+          <li>Live anomaly monitoring dashboard</li>
+        </ul>
+      </div>
+      <div class="future-card">
+        <h3>🗺️ MITRE ATT&CK Mapping</h3>
+        <p style="font-size:13px; margin-bottom: 10px;">Translate anomalous behavior into standardized ATT&amp;CK tactics and techniques for response alignment.</p>
+        <ul>
+          <li>Map anomalies to techniques (e.g. T1046 Network Scanning)</li>
+          <li>Tactic-level classification</li>
+          <li>ATT&CK Navigator integration</li>
+          <li>Automated playbook selection</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout amber">
+      <strong>Status</strong>
+      Current milestone is validation-first hardening. Roadmap work starts after completing additional transfer tests and reporting.
+    </div>
+  </section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">🛡️ DriftGuard · MIT License</div>
+  <div class="footer-right">Generalization-Focused IDS · Explainable Risk Scoring · Deployment Readiness</div>
+</footer>
+
+</body>
 </html>
