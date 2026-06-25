@@ -1,4 +1,4 @@
-# DriftGuard
+# DriftGuard an security for anomaly detection
 
 DriftGuard is a network intrusion detection system (IDS) that uses an ensemble of anomaly detection models to identify malicious network behavior under dataset shift at high traffic.
 
